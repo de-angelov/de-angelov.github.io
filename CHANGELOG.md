@@ -1,4 +1,4 @@
-# Revision history for static-site
+# Revision history for denisangelov.xyz
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

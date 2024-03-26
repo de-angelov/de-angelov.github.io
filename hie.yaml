@@ -1,4 +1,4 @@
 cradle:
   cabal:
     - path: "app/Main.hs"
-      component: "static-site:exe:static-site"
+      component: "denisangelov.xyz:exe:denisangelov.xyz"
