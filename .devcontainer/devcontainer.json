@@ -22,7 +22,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo apt-get install -y libpq-dev entr",
+	"postCreateCommand": "bash -i .devcontainer/install-dependencies.sh",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -36,8 +36,8 @@
 				"hoovercj.haskell-linter",
 				"eamodio.gitlens",
 				"editorconfig.editorconfig",
-        "oderwat.indent-rainbow",
-        "janw4ld.lambda-black"
+        		"oderwat.indent-rainbow",
+        		"janw4ld.lambda-black"
 			],
       "settings": {
         "workbench.colorTheme": "Lambda Dark+"

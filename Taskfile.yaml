@@ -1,0 +1,18 @@
+version: '3'
+
+tasks:
+  build:app:  
+    cmds:
+      - cd ./build &&  rm -rf .shake && cabal build
+    aliases: 
+      - ba
+    silent: true 
+
+  build:site:
+    cmds: 
+      - rm -rf docs && cd ./build && cabal run 
+    aliases:
+      - bs
+    silent: true 
+
+  
