@@ -20,7 +20,7 @@ tasks:
     silent: true 
   deploy:site:
     cmds:
-      - cp ./build/docs ./dist
+      - cp -r ./build/docs ./dist
       - git push origin :gh-pages && git subtree push --prefix dist origin gh-pages" 
     aliases:
       - ds
