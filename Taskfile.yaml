@@ -7,7 +7,11 @@ tasks:
     aliases: 
       - ba
     silent: true 
-
+  serve:site:
+    cmds:
+      - python3 -m http.server 8000 --directory /workspaces/de-angelov.github.io/build/docs/
+    aliases:
+      - ss
   build:site:
     cmds: 
       - rm -rf docs && cd ./build && cabal run 

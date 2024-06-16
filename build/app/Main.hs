@@ -46,10 +46,9 @@ withSiteMeta (Object obj) = Object $ union obj siteMetaObj
     Object siteMetaObj = toJSON siteMeta
 withSiteMeta _ = error "only add site meta to objects"
 
--- -- | Data for the index page
-
-data IndexInfo
-  = IndexInfo
+-- -- | Data for the all posts page
+data  BlogInfo
+  = BlogInfo
   { posts :: [Post]
   } deriving (Generic, Show, ToJSON)
 
@@ -62,6 +61,7 @@ data Post
   { title :: Text
   , tags :: [Tag]
   , date :: Text
+  , url :: Text
   } deriving (Generic, Show, ToJSON, FromJSON, Binary )
 
 data AtomData
@@ -77,27 +77,58 @@ templateFolderPath = "site/templates/"
 
 indexHTML = "index.html"
 
+blogHTML = "blog.html"
+
 postHTML = "post.html"
+
+cvHTML = "cv.html"
 
 atomXML = "atom.xml"
 
 
+
+
 indexTemplatePath = templateFolderPath <> indexHTML
+cvTemplatePath = templateFolderPath <> cvHTML
+blogTemplatePath = templateFolderPath <> blogHTML 
 postTemplatePath = templateFolderPath <> postHTML
 atomTemplatePath = templateFolderPath <> atomXML
 
-buildIndex :: [Post] -> Action ()
-buildIndex posts' = do
-  liftIO . putStrLn $ "test" <> show posts'
+
+buildCV :: Action ()
+buildCV = do
+  cvTemplate <- compileTemplate' cvTemplatePath
+  let cvPage 
+        = toJSON siteMeta
+        & substitute cvTemplate
+        & unpack 
+  writeFile' (outputFolder </> cvHTML) cvPage
+
+
+
+buildIndex :: Action ()
+buildIndex = do
   indexTemplate <- compileTemplate' indexTemplatePath
   let indexPage
-        = IndexInfo { posts = posts' }
-        & toJSON
-        & withSiteMeta
+        = toJSON siteMeta
         & substitute indexTemplate
-        & unpack
+        & unpack 
 
   writeFile' (outputFolder </> indexHTML ) indexPage
+
+buildAllPosts :: [Post] -> Action ()
+buildAllPosts posts' = do
+  liftIO . putStrLn $ "messages: " <> show posts'
+  allPostsTemplate <- compileTemplate' blogTemplatePath
+  let blogPage
+        = BlogInfo { posts = posts' }
+        & toJSON
+        & withSiteMeta
+        & substitute allPostsTemplate
+        & unpack
+
+  writeFile' (outputFolder </> blogHTML ) blogPage
+
 
 -- -- | Find and build all posts
 buildPosts :: Action [Post]
@@ -159,8 +190,6 @@ formatDate humanDate = toIsoDate parsedTime
     parsedTime =
       parseTimeOrError True defaultTimeLocale  "%b %e, %Y" (unpack humanDate) :: UTCTime
 
-
-
 toIsoDate :: UTCTime -> Text
 toIsoDate = pack . formatTime defaultTimeLocale (iso8601DateFormat rfc3339)
   where
@@ -188,8 +217,10 @@ buildFeed posts' = do
 -- --   defines workflow to build the website
 buildRules :: Action ()
 buildRules = do
+  buildIndex
+  buildCV
   allPosts <- buildPosts
-  buildIndex allPosts
+  buildAllPosts allPosts
   buildFeed allPosts
   copyStaticFiles
 

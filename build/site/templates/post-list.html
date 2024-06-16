@@ -1,7 +1,9 @@
-<ul>
+<ul class="post--list">
   {{#posts}}
       <li>
-        {{title}}
+        <a href="{{url}}">
+          {{title}} <span class="post--list__date">{{date}}</span> 
+        </a>
       </li>
   {{/posts}}
 </ul>
