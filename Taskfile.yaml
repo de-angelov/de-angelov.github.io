@@ -14,7 +14,7 @@ tasks:
       - ss
   build:site:
     cmds: 
-      - rm -rf docs && cd ./build && cabal run 
+      - rm -rf ./build/docs && cd ./build && cabal run 
     aliases:
       - bs
     silent: true 

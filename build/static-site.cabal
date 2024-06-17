@@ -75,7 +75,9 @@ executable desite
         aeson, 
         microlens-aeson,
         microlens,
-        shake
+        shake, 
+        uuid,
+        mtl
     -- Directories containing source files.
     hs-source-dirs:   app
 

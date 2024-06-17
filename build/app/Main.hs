@@ -10,15 +10,17 @@ import Data.Aeson.KeyMap (union)
 import Lens.Micro.Aeson (_Object)
 import Slick
 import Development.Shake
-import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1 )
+import Development.Shake.FilePath ( (-<.>), (</>), (<.>), takeDirectory, dropDirectory1, takeFileName )
 import Development.Shake.Forward (cacheAction, shakeArgsForward)
 import Development.Shake.Classes (Binary)
-
-
+import Data.UUID (UUID, toString, toText)
+import Data.UUID.V4 (nextRandom)
 
 import Prelude(putStrLn)
 import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat, formatTime, getCurrentTime)
 -- --Config-----------------------------------------------------------------------
+
+type App = ReaderT FileMeta Action
 
 siteMeta :: SiteMeta
 siteMeta
@@ -39,12 +41,17 @@ data SiteMeta
   , title :: Text
   } deriving (Generic, Show, ToJSON)
 
+data FileMeta
+  = FileMeta
+  { version :: UUID
+  } deriving (Generic, Show, ToJSON)
 
-withSiteMeta :: Value -> Value
-withSiteMeta (Object obj) = Object $ union obj siteMetaObj
+withSiteMeta :: FileMeta -> Value -> Value
+withSiteMeta fileMeta (Object obj) = Object $ RIO.foldr union obj [siteMetaObj, fileMetaObj]
   where
+    Object fileMetaObj = toJSON fileMeta
     Object siteMetaObj = toJSON siteMeta
-withSiteMeta _ = error "only add site meta to objects"
+withSiteMeta _ _ = error "only add site meta to objects"
 
 -- -- | Data for the all posts page
 data  BlogInfo
@@ -86,44 +93,46 @@ cvHTML = "cv.html"
 atomXML = "atom.xml"
 
 
-
-
 indexTemplatePath = templateFolderPath <> indexHTML
 cvTemplatePath = templateFolderPath <> cvHTML
-blogTemplatePath = templateFolderPath <> blogHTML 
+blogTemplatePath = templateFolderPath <> blogHTML
 postTemplatePath = templateFolderPath <> postHTML
 atomTemplatePath = templateFolderPath <> atomXML
 
 
-buildCV :: Action ()
+buildCV :: App ()
 buildCV = do
-  cvTemplate <- compileTemplate' cvTemplatePath
-  let cvPage 
+  fileMeta <- ask
+  cvTemplate <- lift $ compileTemplate' cvTemplatePath
+  let cvPage
         = toJSON siteMeta
+        & (withSiteMeta $ fileMeta)
         & substitute cvTemplate
-        & unpack 
+        & unpack
   writeFile' (outputFolder </> cvHTML) cvPage
 
-
-
-buildIndex :: Action ()
+buildIndex :: App ()
 buildIndex = do
-  indexTemplate <- compileTemplate' indexTemplatePath
+  fileMeta <- ask
+  indexTemplate <- lift $ compileTemplate' indexTemplatePath
   let indexPage
         = toJSON siteMeta
+        & (withSiteMeta $ fileMeta)
         & substitute indexTemplate
-        & unpack 
+        & unpack
 
   writeFile' (outputFolder </> indexHTML ) indexPage
 
-buildAllPosts :: [Post] -> Action ()
+buildAllPosts :: [Post] -> App ()
 buildAllPosts posts' = do
+  fileMeta <- ask
+
   liftIO . putStrLn $ "messages: " <> show posts'
-  allPostsTemplate <- compileTemplate' blogTemplatePath
+  allPostsTemplate <- lift $ compileTemplate' blogTemplatePath
   let blogPage
         = BlogInfo { posts = posts' }
         & toJSON
-        & withSiteMeta
+        & withSiteMeta fileMeta
         & substitute allPostsTemplate
         & unpack
 
@@ -131,17 +140,18 @@ buildAllPosts posts' = do
 
 
 -- -- | Find and build all posts
-buildPosts :: Action [Post]
+buildPosts :: App [Post]
 buildPosts = do
-  pPaths <- getDirectoryFiles "." ["site/posts//*.md"]
-  forP pPaths buildPost
+  fileMeta <- ask
+  pPaths <- lift $ getDirectoryFiles "." ["site/posts//*.md"]
+  lift $ forP pPaths $ buildPost fileMeta
 
 -- -- | Load a post, process metadata, write it to output, then return the post object
 -- -- Detects changes to either post content or template
 
 
-buildPost :: FilePath -> Action Post
-buildPost srcPath = do
+buildPost :: FileMeta -> FilePath -> Action Post
+buildPost fileMeta srcPath = do
     cacheAction ("build" :: Text, srcPath  -<.> "html") $ do
             ("Rebuilding post: " <> srcPath)
               & putStrLn
@@ -161,7 +171,7 @@ buildPost srcPath = do
               fullPostData
                 = postData
                 & _Object . at "url" ?~ String postUrl
-                & withSiteMeta
+                & withSiteMeta fileMeta
 
             postTemplate <- compileTemplate' postTemplatePath
 
@@ -172,16 +182,23 @@ buildPost srcPath = do
             convert fullPostData
 
 -- -- -- | Copy all static files from the listed folders to their destination
-copyStaticFiles :: Action ()
+copyStaticFiles :: App ()
 copyStaticFiles = do
-  filepaths <- getDirectoryFiles "site" ["images//*", "css//*", "js//*"]
-  void $ forP filepaths $ \filepath ->
-    copyFileChanged ("site" </> filepath) (outputFolder </> filepath)
+  fileMeta <- ask
+
+  filepaths <- lift $ getDirectoryFiles "site" ["images//*", "css//*", "js//*"]
+
+  lift $ void $ forP filepaths $ \filepath ->
+    let filePathFinal =   if takeFileName filepath == "index.css"
+                          then takeDirectory filepath </> "index" <.> toString (version fileMeta) <.> "css"
+                          else filepath
+
+    in copyFileChanged ("site" </> filepath) (outputFolder </> filePathFinal)
 
   let pathOtherFiles = "site" </> "other"
-  otherFiles <- getDirectoryContents pathOtherFiles 
+  otherFiles <- lift $  getDirectoryContents pathOtherFiles
 
-  void $ forP otherFiles $ \filepath ->
+  lift $ void $ forP otherFiles $ \filepath ->
     copyFileChanged (pathOtherFiles </> filepath) (outputFolder </> filepath)
 
 formatDate :: Text -> Text
@@ -196,7 +213,7 @@ toIsoDate = pack . formatTime defaultTimeLocale (iso8601DateFormat rfc3339)
     rfc3339 = Just "%H:%M:%SZ"
 
 
-buildFeed :: [Post] -> Action ()
+buildFeed :: [Post] -> App ()
 buildFeed posts' = do
   -- todo
   now <- liftIO getCurrentTime
@@ -207,7 +224,7 @@ buildFeed posts' = do
         , posts = mkAtomPost <$> posts'
         }
 
-  atomTemplate <- compileTemplate' atomTemplatePath
+  atomTemplate <- lift $ compileTemplate' atomTemplatePath
   writeFile' (outputFolder </>  atomXML ) . unpack $ substitute atomTemplate (toJSON atomData)
     where
       mkAtomPost :: Post -> Post
@@ -215,8 +232,9 @@ buildFeed posts' = do
 
 -- -- | Specific build rules for the Shake system
 -- --   defines workflow to build the website
-buildRules :: Action ()
+buildRules :: App ()
 buildRules = do
+  -- liftIO $ traceIO  $ "test"
   buildIndex
   buildCV
   allPosts <- buildPosts
@@ -227,8 +245,10 @@ buildRules = do
 
 main :: IO ()
 main = do
+  guid <- liftIO nextRandom
+
   let sh0pts = shakeOptions {  shakeVerbosity = Verbose, shakeLintInside = ["\\"] }
-  shakeArgsForward sh0pts buildRules
+  shakeArgsForward sh0pts $ runReaderT buildRules FileMeta { version = guid }
 
 -- main :: IO ()
 -- main = runSimpleApp $ do
