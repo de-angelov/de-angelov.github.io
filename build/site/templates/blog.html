@@ -5,12 +5,15 @@
 {{>site/templates/metadata.html}}
 
 <body>
+  <div class="main-container">
   {{>site/templates/header.html}}
   <main>
       <h1>All Posts</h1>
+      {{>site/templates/tags-list.html}}
       {{>site/templates/post-list.html}}
   </main>
   {{>site/templates/footer.html}}
+  </div>
 </body>
 
 </html>

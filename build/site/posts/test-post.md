@@ -1,6 +1,6 @@
 ---
 title: "Sample Post"
-tags: ["test-tag"]
+tags: ["test-tag2", "test-tag3"]
 date: Jan 1, 2019
 ---
 

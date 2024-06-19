@@ -1,5 +1,8 @@
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
+
 module Main where
 
 import RIO
@@ -15,9 +18,11 @@ import Development.Shake.Forward (cacheAction, shakeArgsForward)
 import Development.Shake.Classes (Binary)
 import Data.UUID (UUID, toString, toText)
 import Data.UUID.V4 (nextRandom)
-
 import Prelude(putStrLn)
 import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat, formatTime, getCurrentTime)
+import qualified RIO.Set as Set
+
+
 -- --Config-----------------------------------------------------------------------
 
 type App = ReaderT FileMeta Action
@@ -28,7 +33,6 @@ siteMeta
   { siteAuthor = "Denis"
   , title = "Test Site"
   }
-
 
 outputFolder :: FilePath
 outputFolder = "docs"
@@ -57,6 +61,7 @@ withSiteMeta _ _ = error "only add site meta to objects"
 data  BlogInfo
   = BlogInfo
   { posts :: [Post]
+  , tags :: [Tag]
   } deriving (Generic, Show, ToJSON)
 
 type Tag = Text
@@ -106,7 +111,7 @@ buildCV = do
   cvTemplate <- lift $ compileTemplate' cvTemplatePath
   let cvPage
         = toJSON siteMeta
-        & (withSiteMeta $ fileMeta)
+        & withSiteMeta fileMeta
         & substitute cvTemplate
         & unpack
   writeFile' (outputFolder </> cvHTML) cvPage
@@ -117,11 +122,13 @@ buildIndex = do
   indexTemplate <- lift $ compileTemplate' indexTemplatePath
   let indexPage
         = toJSON siteMeta
-        & (withSiteMeta $ fileMeta)
+        & withSiteMeta  fileMeta
         & substitute indexTemplate
         & unpack
 
   writeFile' (outputFolder </> indexHTML ) indexPage
+
+
 
 buildAllPosts :: [Post] -> App ()
 buildAllPosts posts' = do
@@ -129,8 +136,20 @@ buildAllPosts posts' = do
 
   liftIO . putStrLn $ "messages: " <> show posts'
   allPostsTemplate <- lift $ compileTemplate' blogTemplatePath
-  let blogPage
-        = BlogInfo { posts = posts' }
+
+
+  let
+
+    -- getTags :: Post -> [Tag]
+    -- getTags (Post { tags = postTags }) = postTags  
+    -- getTags Post {..} = tags 
+    -- tags' = RIO.foldr (\(Post{..}, acc) -> acc <> tags ) [] 
+    tags' = posts' & RIO.map (\Post{..} -> tags) & RIO.foldr (<>) [] & Set.fromList & Set.toList
+
+    -- getTags post = tags post   
+    
+    blogPage
+        = BlogInfo { posts = posts', tags = tags' } 
         & toJSON
         & withSiteMeta fileMeta
         & substitute allPostsTemplate
@@ -153,33 +172,33 @@ buildPosts = do
 buildPost :: FileMeta -> FilePath -> Action Post
 buildPost fileMeta srcPath = do
     cacheAction ("build" :: Text, srcPath  -<.> "html") $ do
-            ("Rebuilding post: " <> srcPath)
-              & putStrLn
-              & liftIO
+      ("Rebuilding post: " <> srcPath)
+        & putStrLn
+        & liftIO
 
-            postContent <- readFile' srcPath
-            -- load post content and metadata as JSON blob
+      postContent <- readFile' srcPath
+      -- load post content and metadata as JSON blob
 
-            postData <- markdownToHTML . pack $ postContent
+      postData <- markdownToHTML . pack $ postContent
 
-            let
-              postUrl
-                = (srcPath -<.> "html")
-                & dropDirectory1
-                & pack
+      let
+        postUrl
+          = (srcPath -<.> "html")
+          & dropDirectory1
+          & pack
 
-              fullPostData
-                = postData
-                & _Object . at "url" ?~ String postUrl
-                & withSiteMeta fileMeta
+        fullPostData
+          = postData
+          & _Object . at "url" ?~ String postUrl
+          & withSiteMeta fileMeta
 
-            postTemplate <- compileTemplate' postTemplatePath
+      postTemplate <- compileTemplate' postTemplatePath
 
-            substitute postTemplate fullPostData
-              & unpack
-              & writeFile' (outputFolder </> unpack postUrl)
+      substitute postTemplate fullPostData
+        & unpack
+        & writeFile' (outputFolder </> unpack postUrl)
 
-            convert fullPostData
+      convert fullPostData
 
 -- -- -- | Copy all static files from the listed folders to their destination
 copyStaticFiles :: App ()
@@ -189,9 +208,10 @@ copyStaticFiles = do
   filepaths <- lift $ getDirectoryFiles "site" ["images//*", "css//*", "js//*"]
 
   lift $ void $ forP filepaths $ \filepath ->
-    let filePathFinal =   if takeFileName filepath == "index.css"
-                          then takeDirectory filepath </> "index" <.> toString (version fileMeta) <.> "css"
-                          else filepath
+    let filePathFinal
+          = if takeFileName filepath == "index.css"
+          then takeDirectory filepath </> "index" <.> toString (version fileMeta) <.> "css"
+          else filepath
 
     in copyFileChanged ("site" </> filepath) (outputFolder </> filePathFinal)
 
