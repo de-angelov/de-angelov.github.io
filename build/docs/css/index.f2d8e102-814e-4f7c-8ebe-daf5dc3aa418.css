@@ -1,9 +1,12 @@
 :root {
   --font-size: 62.5%;
   /* --nav-bg-color:  #F0F2EF; */
-  --nav-bg-color:  white;
+  /* --nav-bg-color:  white;
   --main-bg-color: #F0F2EF;
-  --main-text-color: #0D1B1E;
+  --main-text-color: #0D1B1E; */
+  --nav-bg-color:  #0D1B1E;;
+  --main-bg-color: #F0F2EF;
+  --main-text-color: white;
   --primary-color:  #23CE6B;
   /* --secondary-color: #6c757d; */
   --padding: 1rem;
@@ -26,11 +29,12 @@ body {
   background-color: var(--main-bg-color);
   align-items: center;
   font-family: 'Roboto', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   background-attachment: fixed;
   background-color: var(--main-bg-color);
   background-image: linear-gradient(65deg, var(--main-bg-color) 0%, var(--primary-color) 50%, var(--main-bg-color) 100%);
 }
+
 
 header {
   width: 100%;
@@ -104,11 +108,12 @@ footer {
   height: 100%;
   max-width: var(--main-width);
   background-color: var( --nav-bg-color);
-  opacity: 0.97;
+  opacity: 0.9;
   pointer-events: none;
   z-index:-1;
   box-shadow: var(--shadow);
 }
+
 
 
 .header__nav {
@@ -116,7 +121,7 @@ footer {
   font-size: 2rem;
   padding: var(--padding) 0;
   margin-bottom: var(--padding);
-  background-color: var(--nav-bg-color);
+  background-color: var(--main-bg-color);
   display: flex;
   justify-content: center;
   width: 100%;
@@ -175,13 +180,13 @@ footer {
   text-align: center;
   font-size: 1rem;
   list-style-type: none; 
-  border-bottom: 1px solid var(--primary-color);
+  border-bottom: 5px dotted var(--primary-color);
   display: flex;
   justify-content: space-around;
 }
 
 .post--list li:first-child {
-  border-top: 1px solid var(--primary-color);
+  border-top: 5px dotted var(--primary-color);
 }
 
 .post--list:first-child {
@@ -222,4 +227,12 @@ footer {
   /* font-size: 2rem; */
   position: relative;
   /* top: 0.3333333333rem; */
+}
+
+.simple-logo{
+  position: relative;
+  font-size:2rem;
+  color:var(--primary-color);
+  
+
 }
