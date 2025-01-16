@@ -10,40 +10,40 @@
     <meta name=viewport content="width=device-width, initial-scale=1">
     <title>Test Site</title>
     <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="/css/index.f2d8e102-814e-4f7c-8ebe-daf5dc3aa418.css">
+    <link rel="stylesheet" href="/css/index.c5dcd555-f59f-44cd-8ba3-c0f46718ed30.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 </head>
 <body>
   <div class="main-container">
   <header>
-    
+    <div class="header__icon"></div>
     <nav class="header__nav">
       <a id="home" href="/index.html">home</a>
       <a id="blog" href="/blog.html">blog</a>
-      <a id="cv" href="/cv.html">cv</a>
+      <!-- <a id="cv" href="/cv.html">cv</a> -->
     </nav>
   </header>  <main>
       <h1>All Posts</h1>
       <ul class="tag-list">
-          <li> test-tag </li>
-    <li> test-tag2 </li>
-    <li> test-tag3 </li>
+          <li class="tag-list__tag" data-filter="test-tag"> test-tag </li>
+    <li class="tag-list__tag" data-filter="test-tag2"> test-tag2 </li>
+    <li class="tag-list__tag" data-filter="test-tag3"> test-tag3 </li>
 </ul>
       <ul class="post--list">
-            <li>
+            <li data-tags="test-tag">
         <a href="posts/test-post-2.html">
-          Test Site <span class="post--list__date">Jan 1, 2024</span> 
+          Test Site <span class="post--list__date"> &lt Jan 1, 2024 &gt </span> 
         </a>
       </li>
-      <li>
+      <li data-tags="test-tag2,test-tag3">
         <a href="posts/test-post.html">
-          Test Site <span class="post--list__date">Jan 1, 2019</span> 
+          Test Site <span class="post--list__date"> &lt Jan 1, 2019 &gt </span> 
         </a>
       </li>
 </ul>  </main>
   <footer>
-    © 2024  Denis Angelov. All rights reserved.
+    © 2025  Denis Angelov. All rights reserved.
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
   <script src="/js/index.js"></script>  </div>
