@@ -2,6 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use newtype instead of data" #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Main where
 
@@ -10,7 +11,7 @@ import Lens.Micro ((?~), at)
 import RIO.Text
 import Data.Aeson
 import Data.Aeson.KeyMap (union)
-import Lens.Micro.Aeson (_Object)
+import Lens.Micro.Aeson (_Object, key, _Array, _String)
 import Slick
 import Development.Shake
 import Development.Shake.FilePath ( (-<.>), (</>), (<.>), takeDirectory, dropDirectory1, takeFileName )
@@ -67,11 +68,11 @@ data  BlogInfo
 type Tag = Text
 
 -- -- | Data for a blog post
-
 data Post
   = Post
   { title :: Text
   , tags :: [Tag]
+  , tagsAttribute :: Text
   , date :: Text
   , url :: Text
   } deriving (Generic, Show, ToJSON, FromJSON, Binary )
@@ -139,7 +140,6 @@ buildAllPosts posts' = do
 
 
   let
-
     -- getTags :: Post -> [Tag]
     -- getTags (Post { tags = postTags }) = postTags  
     -- getTags Post {..} = tags 
@@ -187,9 +187,13 @@ buildPost fileMeta srcPath = do
           & dropDirectory1
           & pack
 
+
+        tagsArray = postData ^.. key "tags" . _Array . traverse . _String
+
         fullPostData
           = postData
           & _Object . at "url" ?~ String postUrl
+          & _Object . at "tagsAttribute" ?~ String (intercalate "," tagsArray)
           & withSiteMeta fileMeta
 
       postTemplate <- compileTemplate' postTemplatePath

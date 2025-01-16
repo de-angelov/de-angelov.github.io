@@ -1,8 +1,8 @@
 <ul class="post--list">
   {{#posts}}
-      <li>
+      <li data-tags="{{tagsAttribute}}">
         <a href="{{url}}">
-          {{title}} <span class="post--list__date">{{date}}</span> 
+          {{title}} <span class="post--list__date"> &lt {{date}} &gt </span> 
         </a>
       </li>
   {{/posts}}
