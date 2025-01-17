@@ -6,11 +6,11 @@
 <head profile="http://www.w3.org/2005/10/profile">
     <meta charset="UTF-8">
     <meta name="description" content="Personal blog">
-    <meta name="author" content="Denis">
+    <meta name="author" content="Denis Angelov">
     <meta name=viewport content="width=device-width, initial-scale=1">
-    <title>Test Site</title>
+    <title></title>
     <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="/css/index.c5dcd555-f59f-44cd-8ba3-c0f46718ed30.css">
+    <link rel="stylesheet" href="/css/index.c2840564-f822-447a-9864-4d2cca2e96d8.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 </head>
@@ -25,20 +25,18 @@
     </nav>
   </header>  <main>
       <h1>All Posts</h1>
+      <p class="post__rss-feed">
+        <a href="https://denisangelov.xyz/atom.xml"> RSS </a>
+      </p>
       <ul class="tag-list">
-          <li class="tag-list__tag" data-filter="test-tag"> test-tag </li>
-    <li class="tag-list__tag" data-filter="test-tag2"> test-tag2 </li>
-    <li class="tag-list__tag" data-filter="test-tag3"> test-tag3 </li>
+          <li class="tag-list__tag tag-list__tag--selected" data-filter="all"> all tags </li>
+          <li class="tag-list__tag" data-filter="2025"> 2025 </li>
+    <li class="tag-list__tag" data-filter="Haskell"> Haskell </li>
 </ul>
-      <ul class="post--list">
-            <li data-tags="test-tag">
-        <a href="posts/test-post-2.html">
-          Test Site <span class="post--list__date"> &lt Jan 1, 2024 &gt </span> 
-        </a>
-      </li>
-      <li data-tags="test-tag2,test-tag3">
-        <a href="posts/test-post.html">
-          Test Site <span class="post--list__date"> &lt Jan 1, 2019 &gt </span> 
+      <ul class="post__list">
+            <li data-tags="2025,Haskell" class="post__list_link" >
+        <a href="posts/1-hello-world.html">
+          Hello World <span class="post__list__date"> Jan 18, 2025 </span>   &lt 2025 | Haskell &gt
         </a>
       </li>
 </ul>  </main>
