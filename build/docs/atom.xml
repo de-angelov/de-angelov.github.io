@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>Placeholder Title</title>
+    <title>DA Blog</title>
     <link href="" rel="self" type="application/rss+xml" />
   <author>
-      <name>Denis</name>
+      <name>Denis Angelov</name>
   </author>
+
+  <entry>
+      <title>Hello World</title>
+      <updated>2025-01-18T00:00:00Z</updated>
+      <category term="2025"/>
+      <category term="Haskell"/>
+      <link>https://denisangelov.xyz/posts/1-hello-world.html/</link>
+  </entry>
 </feed>

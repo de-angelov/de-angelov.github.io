@@ -24,16 +24,17 @@ import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat
 import qualified RIO.Set as Set
 
 
--- --Config-----------------------------------------------------------------------
+-- -- --Config-----------------------------------------------------------------------
 
 type App = ReaderT FileMeta Action
 
 siteMeta :: SiteMeta
 siteMeta
   = SiteMeta
-  { siteAuthor = "Denis"
-  , title = "Test Site"
-  }
+  { siteAuthor = "Denis Angelov"
+  , siteTitle = "DA Blog"
+  , siteDomain = "https://denisangelov.xyz/"
+  } 
 
 outputFolder :: FilePath
 outputFolder = "docs"
@@ -43,7 +44,8 @@ outputFolder = "docs"
 data SiteMeta
   = SiteMeta
   { siteAuthor :: Text
-  , title :: Text
+  , siteTitle :: Text
+  , siteDomain :: Text
   } deriving (Generic, Show, ToJSON)
 
 data FileMeta
@@ -73,6 +75,7 @@ data Post
   { title :: Text
   , tags :: [Tag]
   , tagsAttribute :: Text
+  , tagsDisplay :: Text
   , date :: Text
   , url :: Text
   } deriving (Generic, Show, ToJSON, FromJSON, Binary )
@@ -82,6 +85,7 @@ data AtomData
   { title :: Text
   , author :: Text
   , posts :: [Post]
+  , currentTime :: Text
   } deriving (Generic, Show, ToJSON )
 
 -- -- | given a list of posts this will build a table of contents
@@ -194,6 +198,7 @@ buildPost fileMeta srcPath = do
           = postData
           & _Object . at "url" ?~ String postUrl
           & _Object . at "tagsAttribute" ?~ String (intercalate "," tagsArray)
+          & _Object . at "tagsDisplay" ?~ String (intercalate " | " tagsArray)
           & withSiteMeta fileMeta
 
       postTemplate <- compileTemplate' postTemplatePath
@@ -241,18 +246,23 @@ buildFeed :: [Post] -> App ()
 buildFeed posts' = do
   -- todo
   now <- liftIO getCurrentTime
-  let atomData
+  let 
+    atomData
         = AtomData
-        { title = "Placeholder Title"
+        { title = siteTitle siteMeta 
         , author = siteAuthor siteMeta
         , posts = mkAtomPost <$> posts'
+        , currentTime = toIsoDate now
         }
 
   atomTemplate <- lift $ compileTemplate' atomTemplatePath
   writeFile' (outputFolder </>  atomXML ) . unpack $ substitute atomTemplate (toJSON atomData)
     where
       mkAtomPost :: Post -> Post
-      mkAtomPost p = p { date = formatDate $ date p }
+      mkAtomPost p = p 
+        { date = formatDate $ date p
+        , url = siteDomain siteMeta <> url p 
+        }
 
 -- -- | Specific build rules for the Shake system
 -- --   defines workflow to build the website

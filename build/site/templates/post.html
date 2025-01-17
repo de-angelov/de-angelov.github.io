@@ -4,18 +4,17 @@
   <body>
   <div class="main-container">
     {{>site/templates/header.html}}
-    <a href="/" class="post__back-button"> < Back </a>
+    <a href="/blog.html" class="post__back-button"> < Back </a>
     <main>
       <div class="wrapper">
         <div class="masthead">
-          <h1>
-            {{title}}
-          </h1>
-          <div class="tags">
-            {{#tags}}
-            <span class="tag {{.}}">{{.}}</span>
-            {{/tags}}
+          <div class="post__tags">
+            {{date}} &lt {{tagsDisplay}} &gt
           </div>
+          <h1>
+            {{title}} 
+          </h1>
+    
         </div>
       </div>
       <article class="post">

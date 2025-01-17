@@ -5,4 +5,15 @@
   <author>
       <name>{{author}}</name>
   </author>
+
+  {{#posts}}
+  <entry>
+      <title>{{title}}</title>
+      <updated>{{date}}</updated>
+      {{#tags}}
+      <category term="{{.}}"/>
+      {{/tags}}
+      <link>{{url}}/</link>
+  </entry>
+  {{/posts}}
 </feed>

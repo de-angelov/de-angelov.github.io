@@ -1,4 +1,18 @@
 (function () {
+
+	var filterParamName = "filter";
+	var filterDataAttr = "data-filter";
+
+	function getTagsButtons(){ return Array.from(document.querySelectorAll('.tag-list__tag')); };
+	function markTagAsSelected(b){ b.classList.add('tag-list__tag--selected') };
+	function markTagAsDeselected(b) { b.classList.remove('tag-list__tag--selected'); };
+	function getCurrentActiveFilters() { 
+		var currentURL = new URL(window.location.href);
+		return  (currentURL.searchParams.get(filterParamName) || "")
+		.split(',')
+		.filter(x => x !== "");
+	}
+
 	function highlightCurrentPage() {
 		var currentPath = window.location.pathname.split('/').pop();
 		var selector = "#blog"
@@ -21,45 +35,65 @@
 		mermaid && mermaid.initialize({ startOnLoad: true });
 	}
 
-	var filterParam = "filter";
-	var currentURL = new URL(window.location.href);
-
+	
 	function handleFilterClick(e) {
+		var currentURL = new URL(window.location.href);
 		
-		var filterValue = e.target.getAttribute('data-filter');
+		var filterValue = e.target.getAttribute(filterDataAttr);
 		
-		console.log('click', e.target, filterValue);
+		var currentFilters = getCurrentActiveFilters();
 
-		var currentFilters = (currentURL.searchParams.get(filterParam) || "").split(',');
-		var updatedFilter = currentFilters.includes(filterValue)
-			? currentFilters.filter(function (x) { x !== filterValue })
+		var updatedFilters = currentFilters.includes(filterValue)
+			? currentFilters.filter(function (x) { return x !== filterValue })
 			: [...currentFilters, filterValue];
+		
+		if(filterValue === 'all' || updatedFilters.length === 0){
+			currentURL.searchParams.delete(filterParamName);
+		} else {
+			currentURL.searchParams.set(filterParamName, updatedFilters.join(','));
+		}
 
-		currentURL.searchParams.set('filter', updatedFilter.join(','));
+		window.history.pushState({}, '', currentURL.toString());
 		hideShowFilters();
 	}
 
 	function hideShowFilters() {
-		var currentFilters = (currentURL.searchParams.get(filterParam) || "").split(',');
-		var currentBlogLinks = Array.from(document.querySelectorAll('.blog__article')) || [];
+		var currentFilters = getCurrentActiveFilters();
+		
+		var currentBlogLinks = Array.from(document.querySelectorAll('.post__list_link')) || [];
+		var tagButtons = getTagsButtons();
 
 		currentBlogLinks.forEach(function (a) {
-			var tags = a.attributes.getNamedItem('data-tags').split(',')
-			var hasFilter = currentFilters.some(x => tags.includes(x));
+			var tags = a.getAttribute('data-tags').split(',')
+			var hasSelectedFilterTag = 
+				currentFilters.length === 0 ||
+				currentFilters.some(x => tags.includes(x));
 
-			a.style.display = hasFilter ? 'none' : 'inherit';
-
+			a.style.display = hasSelectedFilterTag ? 'inherit' : 'none';
 		});
+
+		if(currentFilters.length === 0) {
+			tagButtons
+				.forEach(markTagAsDeselected);
+
+			tagButtons
+				.filter(b => b.getAttribute(filterDataAttr) === 'all')
+				.forEach(markTagAsSelected);
+		} else {
+			tagButtons
+				.filter(b => b.getAttribute(filterDataAttr) === 'all')
+				.map(markTagAsDeselected);
+
+			tagButtons
+				.filter(b => currentFilters.some(function(f) { return f == b.getAttribute(filterDataAttr); }))
+				.forEach(markTagAsSelected);
+		}
 
 	}
 
 	function initFiltering() {
-		// init button filtering 
-
-		const buttons = Array.from(document.querySelectorAll('.tag-list__tag'));
-
+		const buttons = getTagsButtons();
 		buttons.forEach(function (b) { b.addEventListener('click', handleFilterClick) });
-
 	}
 
 	document
@@ -71,5 +105,4 @@
 				initFiltering();
 				hideShowFilters();
 			});
-
 })();
