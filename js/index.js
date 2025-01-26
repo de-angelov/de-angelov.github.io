@@ -81,11 +81,11 @@
 				.forEach(markTagAsSelected);
 		} else {
 			tagButtons
-				.filter(b => b.getAttribute(filterDataAttr) === 'all')
-				.map(markTagAsDeselected);
+				.forEach(markTagAsDeselected);
 
 			tagButtons
 				.filter(b => currentFilters.some(function(f) { return f == b.getAttribute(filterDataAttr); }))
+				.map(x => { console.log("currentfilters", x); return x })
 				.forEach(markTagAsSelected);
 		}
 
