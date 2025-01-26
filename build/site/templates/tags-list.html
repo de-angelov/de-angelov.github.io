@@ -1,6 +1,10 @@
 <ul class="tag-list">
-    <li class="tag-list__tag tag-list__tag--selected" data-filter="all"> all tags </li>
+    <li>
+        <button class="tag-list__tag tag-list__tag--selected" data-filter="all">all tags</button>
+    </li>
     {{#tags}}
-    <li class="tag-list__tag" data-filter="{{.}}"> {{.}} </li>
+    <li>
+        <button class="tag-list__tag" data-filter="{{.}}">{{.}}</button>
+    </li>
     {{/tags}}
 </ul>
