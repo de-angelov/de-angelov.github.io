@@ -13,4 +13,12 @@
       <category term="Haskell"/>
       <link>https://denisangelov.xyz/posts/1-hello-world.html/</link>
   </entry>
+  <entry>
+      <title>IIEF in modern JS</title>
+      <updated>2025-02-13T00:00:00Z</updated>
+      <category term="2025"/>
+      <category term="JavaScript"/>
+      <category term="Functional Programming"/>
+      <link>https://denisangelov.xyz/posts/2-IIEF in modern JS.html/</link>
+  </entry>
 </feed>

@@ -8,7 +8,8 @@
       <meta name=viewport content="width=device-width, initial-scale=1">
       <title>Hello World</title>
       <link rel="stylesheet" href="/css/reset.css">
-      <link rel="stylesheet" href="/css/index.a0ae9768-562c-4513-bc2b-8894285a698b.css">
+      <link rel="stylesheet" href="/css/prism.css">
+      <link rel="stylesheet" href="/css/index.6072651d-ead0-4248-8b12-1cd12e055ae2.css">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   </head>  <body>
@@ -38,18 +39,35 @@
         </div>
       </div>
       <article class="post">
-        <p>Some technical info as my first post:</p>
+        <p>Arguably, it might be a bit of overengineering for a simple blog to
+use Haskell.But at least I can get some programmer cred :)</p>
+<p>Some details:</p>
 <ul>
 <li><p>Uses Haskell site generator <a
 href="https://github.com/ChrisPenner/slick">Slick</a></p></li>
-<li><p>Supports <a href="https://mermaid.js.org/">Mermaid diagrams</a>
-Markdown extensions</p></li>
+<li><p><a href="https://taskfile.dev/">Task</a> simple task
+runner</p></li>
+<li><p><a href="https://mermaid.js.org/">Mermaid diagrams</a> markdown
+extensions</p></li>
+<li><p><a href="https://mermaid.js.org/">Prism</a> syntax
+highlighter</p></li>
 <li><p>The site background comes from <a
 href="https://heropatterns.com/">Hero Patterns</a></p></li>
 </ul>
-<p>Arguably, it might be a bit of overengineering for a simple blog to
-use Haskell.</p>
-<p>But at least I can get some programmer cred :)</p>
+<p>Some examples</p>
+<pre>
+    <code class="language-js">
+    () => { console.log(10);}
+    </code>
+
+    <p class="mermaid">
+    graph TD;
+        A[Square Rect] -- Link text --> B((Circle))
+        A --> C(Round Rect)
+        B --> D{Rhombus}
+        C --> D
+    </p>
+</pre>
         <br>
         <br>
       </article>
@@ -58,6 +76,7 @@ use Haskell.</p>
       © 2025  Denis Angelov. All rights reserved.
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
-    <script src="/js/index.js"></script>  </div>
+    <script src="/js/index.js"></script>
+    <script src="/js/prism.js"></script>  </div>
   </body>
 </html>
