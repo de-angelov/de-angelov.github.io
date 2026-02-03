@@ -1,6 +1,6 @@
 ---
 title: "IIEF in modern JS"
-tags: ["2025", "JavaScript", "Functional Programming"]
+tags: ["2025", "JavaScript", "FP"]
 date: Feb 13, 2025
 ---
 In modern JavaScript there is one rarely seen feature [IIFE](https://developer.mozilla.org/en-US/docs/Glossary/IIFEs).

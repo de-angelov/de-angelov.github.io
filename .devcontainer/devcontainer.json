@@ -1,4 +1,4 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+showshow// For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
 	"name": "Ubuntu",
@@ -9,8 +9,8 @@
 			"installHLS": true,
 			"downgradeGhcToSupportHls": true,
 			"adjustBash": true,
-			"ghcVersion": "recommended",
-			"cabalVersion": "recommended",
+			"ghcVersion": "9.6.4",
+			"cabalVersion": "3.10.3.0",
 			"globalPackages": "hlint hspec pandoc fourmolu"
 		}
 	},
@@ -48,7 +48,9 @@
 		"8080": {
 			"label": "8080 : mainapp"
 		}
-	}
+	},
+	// for linux only , speeds speed
+	 "runArgs": ["--network=host"]
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"

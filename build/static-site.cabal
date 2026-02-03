@@ -24,7 +24,7 @@ version:            0.1.0.0
 
 -- A short (one-line) description of the package.
 -- synopsis:
-
+base >=4.18 && <4.19
 -- A longer description of the package.
 -- description:
 
@@ -69,7 +69,7 @@ executable desite
 
     -- Other library packages from which modules are imported.
     build-depends:    
-        base ^>=4.17.2.0,
+        base >=4.18 && <4.19,
         rio,
         slick,
         aeson, 

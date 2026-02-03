@@ -22,6 +22,7 @@ import Data.UUID.V4 (nextRandom)
 import Prelude(putStrLn)
 import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat, formatTime, getCurrentTime)
 import qualified RIO.Set as Set
+import qualified RIO.List as List
 
 
 -- -- --Config-----------------------------------------------------------------------
@@ -172,42 +173,79 @@ buildPosts = do
 -- -- | Load a post, process metadata, write it to output, then return the post object
 -- -- Detects changes to either post content or template
 
-
 buildPost :: FileMeta -> FilePath -> Action Post
 buildPost fileMeta srcPath = do
-    cacheAction ("build" :: Text, srcPath  -<.> "html") $ do
-      ("Rebuilding post: " <> srcPath)
-        & putStrLn
-        & liftIO
+  -- Declare dependencies
+  need [srcPath, postTemplatePath]
 
-      postContent <- readFile' srcPath
-      -- load post content and metadata as JSON blob
+  putNormal $ "Rebuilding post: " <> srcPath
 
-      postData <- markdownToHTML . pack $ postContent
+  postContent <- readFile' srcPath
+  postData <- markdownToHTML . pack $ postContent
 
-      let
-        postUrl
-          = (srcPath -<.> "html")
-          & dropDirectory1
-          & pack
+  let
+    postUrl =
+      srcPath
+        & (-<.> "html")
+        & dropDirectory1
+        & pack
+
+    tagsArray =
+      postData ^.. key "tags" . _Array . traverse . _String
+
+    fullPostData =
+      postData
+        & _Object . at "url" ?~ String postUrl
+        & _Object . at "tagsAttribute"
+            ?~ String (intercalate "," tagsArray)
+        & _Object . at "tagsDisplay"
+            ?~ String (intercalate " | " tagsArray)
+        & withSiteMeta fileMeta
+
+  postTemplate <- compileTemplate' postTemplatePath
+
+  substitute postTemplate fullPostData
+    & unpack
+    & writeFile' (outputFolder </> unpack postUrl)
+
+  convert fullPostData
 
 
-        tagsArray = postData ^.. key "tags" . _Array . traverse . _String
+-- buildPost :: FileMeta -> FilePath -> Action Post
+-- buildPost fileMeta srcPath = do
+--     cacheAction ("build" :: Text, srcPath  -<.> "html") $ do
+--       ("Rebuilding post: " <> srcPath)
+--         & putStrLn
+--         & liftIO
 
-        fullPostData
-          = postData
-          & _Object . at "url" ?~ String postUrl
-          & _Object . at "tagsAttribute" ?~ String (intercalate "," tagsArray)
-          & _Object . at "tagsDisplay" ?~ String (intercalate " | " tagsArray)
-          & withSiteMeta fileMeta
+--       postContent <- readFile' srcPath
+--       -- load post content and metadata as JSON blob
 
-      postTemplate <- compileTemplate' postTemplatePath
+--       postData <- markdownToHTML . pack $ postContent
 
-      substitute postTemplate fullPostData
-        & unpack
-        & writeFile' (outputFolder </> unpack postUrl)
+--       let
+--         postUrl
+--           = (srcPath -<.> "html")
+--           & dropDirectory1
+--           & pack
 
-      convert fullPostData
+
+--         tagsArray = postData ^.. key "tags" . _Array . traverse . _String
+
+--         fullPostData
+--           = postData
+--           & _Object . at "url" ?~ String postUrl
+--           & _Object . at "tagsAttribute" ?~ String (intercalate "," tagsArray)
+--           & _Object . at "tagsDisplay" ?~ String (intercalate " | " tagsArray)
+--           & withSiteMeta fileMeta
+
+--       postTemplate <- compileTemplate' postTemplatePath
+
+--       substitute postTemplate fullPostData
+--         & unpack
+--         & writeFile' (outputFolder </> unpack postUrl)
+
+--       convert fullPostData
 
 -- -- -- | Copy all static files from the listed folders to their destination
 copyStaticFiles :: App ()
@@ -264,6 +302,15 @@ buildFeed posts' = do
         , url = siteDomain siteMeta <> url p 
         }
 
+
+sortPostsByDateDesc =
+  let
+    parsePostDate :: Post -> UTCTime
+    parsePostDate Post{..} =
+      parseTimeOrError True defaultTimeLocale "%b %e, %Y" (unpack date)
+  in
+    List.sortOn (Down . parsePostDate)
+
 -- -- | Specific build rules for the Shake system
 -- --   defines workflow to build the website
 buildRules :: App ()
@@ -271,7 +318,7 @@ buildRules = do
   -- liftIO $ traceIO  $ "test"
   buildIndex
   buildCV
-  allPosts <- buildPosts
+  allPosts <- sortPostsByDateDesc <$> buildPosts
   buildAllPosts allPosts
   buildFeed allPosts
   copyStaticFiles

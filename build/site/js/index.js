@@ -2,8 +2,9 @@
 
 	var filterParamName = "filter";
 	var filterDataAttr = "data-filter";
+	var tagButtons = [];
+	var blogLinks = [];
 
-	function getTagsButtons(){ return Array.from(document.querySelectorAll('.tag-list__tag')); };
 	function markTagAsSelected(b){ b.classList.add('tag-list__tag--selected') };
 	function markTagAsDeselected(b) { b.classList.remove('tag-list__tag--selected'); };
 	function getCurrentActiveFilters() { 
@@ -14,21 +15,24 @@
 	}
 
 	function highlightCurrentPage() {
-		var currentPath = window.location.pathname.split('/').pop();
-		var selector = "#blog"
+		var currentPath = window.location.pathname;
+		var selector = "#home";
 
-		if (currentPath == "cv.html") {
-			selector = "#cv"
+		if (currentPath.includes("cv.html")) {
+			selector = "#cv";
+		}	
+
+		if (currentPath.includes("blog.html") || currentPath.includes("posts/")) {
+			selector = "#blog";
 		}
 
-		if (currentPath == "" || currentPath == "index.html") {
-			selector = "#home"
+		var activeElement = document.querySelector(selector);
+	
+		if (activeElement) {
+			activeElement.classList.add("header__nav--active");
+		
+			activeElement.setAttribute("aria-current", "page");
 		}
-
-		document
-			.querySelector(selector)
-			.classList
-			.add("header__nav--active")
 	}
 
 	function initMermaidCharts() {
@@ -39,7 +43,7 @@
 	function handleFilterClick(e) {
 		var currentURL = new URL(window.location.href);
 		
-		var filterValue = e.target.getAttribute(filterDataAttr);
+		var filterValue = e.currentTarget.getAttribute(filterDataAttr);
 		
 		var currentFilters = getCurrentActiveFilters();
 
@@ -59,11 +63,8 @@
 
 	function hideShowFilters() {
 		var currentFilters = getCurrentActiveFilters();
-		
-		var currentBlogLinks = Array.from(document.querySelectorAll('.post__list_link')) || [];
-		var tagButtons = getTagsButtons();
 
-		currentBlogLinks.forEach(function (a) {
+		blogLinks.forEach(function (a) {
 			var tags = a.getAttribute('data-tags').split(',')
 			var hasSelectedFilterTag = 
 				currentFilters.length === 0 ||
@@ -92,8 +93,9 @@
 	}
 
 	function initFiltering() {
-		const buttons = getTagsButtons();
-		buttons.forEach(function (b) { b.addEventListener('click', handleFilterClick) });
+		tagButtons = Array.from(document.querySelectorAll('.tag-list__tag'));
+		blogLinks = Array.from(document.querySelectorAll('.post__list_link'));
+		tagButtons.forEach(function (b) { b.addEventListener('click', handleFilterClick) });
 	}
 
 	document
@@ -104,5 +106,9 @@
 				initMermaidCharts();
 				initFiltering();
 				hideShowFilters();
+				window.addEventListener('popstate', () => { 
+					highlightCurrentPage();
+					hideShowFilters();
+				});
 			});
 })();

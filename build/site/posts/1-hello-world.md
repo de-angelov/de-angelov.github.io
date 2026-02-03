@@ -3,10 +3,10 @@ title: "Hello World"
 tags: ["2025", "Haskell"]
 date: Jan 18, 2025
 ---
+Arguably, it might be a bit of overengineering for a simple blog to use Haskell. But at least I get programmer cred right?  
+But sadly it also has a bit of JS scripting bloat :( 
 
-Arguably, it might be a bit of overengineering for a simple blog to use Haskell.But at least I can get some programmer cred :)
-
-Some details:
+Details:
 
 - Uses Haskell site generator [Slick](https://github.com/ChrisPenner/slick)
 - [Task](https://taskfile.dev/) simple task runner
@@ -18,7 +18,7 @@ Some details:
 - The site background comes from [Hero Patterns](https://heropatterns.com/)
 
 
-Some examples
+Examples:
 
 <pre>
     <code class="language-js">
