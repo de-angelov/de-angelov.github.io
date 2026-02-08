@@ -22,10 +22,7 @@
           #   hp.cabal-install
           #   hp.haskell-language-server
           # ]);
-          haskell-language-server = hprev.haskell-language-server.override {
-            withHoogle = true;
-            supportedGhcVersions = [ "96" ]; # Adjust based on needed GHC version
-          };
+          haskell-language-server = hprev.haskell-language-server;
         };
       };
 
@@ -41,7 +38,7 @@
           haskellPackages.pandoc   # from original devcontainer.json
 
           # Other tools
-          task # go-task
+          go-task # go-task
           entr
           postgresql # Provides libpq-dev
           nodejs     # for any JS needs
