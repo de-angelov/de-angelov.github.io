@@ -14,11 +14,12 @@ import Data.Aeson.KeyMap (union)
 import Lens.Micro.Aeson (_Object, key, _Array, _String)
 import Slick
 import Development.Shake
-import Development.Shake.FilePath ( (-<.>), (</>), (<.>), takeDirectory, dropDirectory1, takeFileName )
-import Development.Shake.Forward (cacheAction, shakeArgsForward)
+import Development.Shake.FilePath ( (-<.>), (</>), (<.>), dropDirectory1, takeFileName )
+-- import Development.Shake.Forward (cacheAction, shakeArgsForward)
 import Development.Shake.Classes (Binary)
 import Data.UUID (UUID, toString, toText)
 import Data.UUID.V4 (nextRandom)
+import System.Directory (createDirectoryIfMissing, removeDirectoryRecursive)
 import Prelude(putStrLn)
 import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat, formatTime, getCurrentTime)
 import qualified RIO.Set as Set
@@ -95,12 +96,16 @@ templateFolderPath = "site/templates/"
 
 indexHTML = "index.html"
 
+blogHTML :: FilePath
 blogHTML = "blog.html"
 
+postHTML :: FilePath
 postHTML = "post.html"
 
+cvHTML :: FilePath
 cvHTML = "cv.html"
 
+atomXML :: FilePath
 atomXML = "atom.xml"
 
 
@@ -145,14 +150,7 @@ buildAllPosts posts' = do
 
 
   let
-    -- getTags :: Post -> [Tag]
-    -- getTags (Post { tags = postTags }) = postTags  
-    -- getTags Post {..} = tags 
-    -- tags' = RIO.foldr (\(Post{..}, acc) -> acc <> tags ) [] 
-    tags' = posts' & RIO.map (\Post{..} -> tags) & RIO.foldr (<>) [] & Set.fromList & Set.toList
-
-    -- getTags post = tags post   
-    
+    tags' = posts' & RIO.map (\Post{..} -> tags) & RIO.foldr (<>) [] & Set.fromList & Set.toList    
     blogPage
         = BlogInfo { posts = posts', tags = tags' } 
         & toJSON
@@ -211,59 +209,40 @@ buildPost fileMeta srcPath = do
   convert fullPostData
 
 
--- buildPost :: FileMeta -> FilePath -> Action Post
--- buildPost fileMeta srcPath = do
---     cacheAction ("build" :: Text, srcPath  -<.> "html") $ do
---       ("Rebuilding post: " <> srcPath)
---         & putStrLn
---         & liftIO
-
---       postContent <- readFile' srcPath
---       -- load post content and metadata as JSON blob
-
---       postData <- markdownToHTML . pack $ postContent
-
---       let
---         postUrl
---           = (srcPath -<.> "html")
---           & dropDirectory1
---           & pack
-
-
---         tagsArray = postData ^.. key "tags" . _Array . traverse . _String
-
---         fullPostData
---           = postData
---           & _Object . at "url" ?~ String postUrl
---           & _Object . at "tagsAttribute" ?~ String (intercalate "," tagsArray)
---           & _Object . at "tagsDisplay" ?~ String (intercalate " | " tagsArray)
---           & withSiteMeta fileMeta
-
---       postTemplate <- compileTemplate' postTemplatePath
-
---       substitute postTemplate fullPostData
---         & unpack
---         & writeFile' (outputFolder </> unpack postUrl)
-
---       convert fullPostData
-
--- -- -- | Copy all static files from the listed folders to their destination
 copyStaticFiles :: App ()
 copyStaticFiles = do
   fileMeta <- ask
+  
+  let 
+    tmpCssDir = "build/tmp/css"
+    tmpJsDir = "build/tmp/js"
+    minifiedCssPath = tmpCssDir </> "index.min.css"
+    minifiedJsPath = tmpJsDir </> "index.min.js"
 
-  filepaths <- lift $ getDirectoryFiles "site" ["images//*", "css//*", "js//*"]
+  liftIO $ createDirectoryIfMissing True tmpCssDir
+  liftIO $ createDirectoryIfMissing True tmpJsDir
 
-  lift $ void $ forP filepaths $ \filepath ->
-    let filePathFinal
-          = if takeFileName filepath == "index.css"
-          then takeDirectory filepath </> "index" <.> toString (version fileMeta) <.> "css"
-          else filepath
 
-    in copyFileChanged ("site" </> filepath) (outputFolder </> filePathFinal)
+  lift $ cmd_ ("/usr/bin/esbuild" :: String) ("site/css/index.css" :: String) ("--minify" :: String) ("--outfile=" <> minifiedCssPath)
+  lift $ cmd_ ("/usr/bin/esbuild" :: String) ("site/js/index.js" :: String)  ("--minify" :: String) ("--outfile=" <> minifiedJsPath)
+
+  let finalCssPath = outputFolder </>  "css" </> "index" <.> toString (version fileMeta) <.> "css"
+  lift $ copyFileChanged minifiedCssPath finalCssPath
+
+  let finalJsPath = outputFolder </>  "js" </>  "index" <.> toString (version fileMeta) <.> "js"
+  lift $ copyFileChanged minifiedJsPath finalJsPath
+
+  liftIO $ removeDirectoryRecursive "build/tmp"
+
+
+  filepaths <- lift $ getDirectoryFiles "site" ["images//*", "css//*.css", "js//*.js"]
+  let filteredFilepaths = List.filter (\fp -> takeFileName fp /= "index.css" && takeFileName fp /= "index.js") filepaths
+
+  lift $ void $ forP filteredFilepaths $ \filepath ->
+    copyFileChanged ("site" </> filepath) (outputFolder </> filepath)
 
   let pathOtherFiles = "site" </> "other"
-  otherFiles <- lift $  getDirectoryContents pathOtherFiles
+  otherFiles <- lift $ getDirectoryContents pathOtherFiles
 
   lift $ void $ forP otherFiles $ \filepath ->
     copyFileChanged (pathOtherFiles </> filepath) (outputFolder </> filepath)
@@ -282,7 +261,6 @@ toIsoDate = pack . formatTime defaultTimeLocale (iso8601DateFormat rfc3339)
 
 buildFeed :: [Post] -> App ()
 buildFeed posts' = do
-  -- todo
   now <- liftIO getCurrentTime
   let 
     atomData
@@ -315,7 +293,6 @@ sortPostsByDateDesc =
 -- --   defines workflow to build the website
 buildRules :: App ()
 buildRules = do
-  -- liftIO $ traceIO  $ "test"
   buildIndex
   buildCV
   allPosts <- sortPostsByDateDesc <$> buildPosts
@@ -324,16 +301,21 @@ buildRules = do
   copyStaticFiles
 
 
+-- main :: IO ()
+-- main = do
+--   guid <- liftIO nextRandom
+
+--   let sh0pts = shakeOptions {  shakeVerbosity = Verbose, shakeLintInside = ["\\"] }
+--   shakeArgsForward sh0pts $ runReaderT buildRules FileMeta { version = guid }
+
 main :: IO ()
 main = do
-  guid <- liftIO nextRandom
+    -- Generate a new UUID for this build
+    guid <- nextRandom
+    let fileMeta = FileMeta { version = guid }
 
-  let sh0pts = shakeOptions {  shakeVerbosity = Verbose, shakeLintInside = ["\\"] }
-  shakeArgsForward sh0pts $ runReaderT buildRules FileMeta { version = guid }
-
--- main :: IO ()
--- main = runSimpleApp $ do
---   logInfo "Hello, RIO! 1"
---   let sh0pts = shakeOptions {  shakeVerbosity = Verbose, shakeLintInside = ["\\"] }
---   liftIO $ shakeArgsForward sh0pts buildRules 
---   logInfo "Hello, RIO! 2"
+    -- Shake options
+    let 
+      sh0pts = shakeOptions { shakeVerbosity = Verbose, shakeLintInside = ["\\"] }
+      rules = action $ runReaderT buildRules fileMeta
+    shakeArgs sh0pts rules

@@ -18,14 +18,12 @@ date: Feb 02, 2026
 ## Browsers
 
 **[Ungoogled Chromium](https://github.com/ungoogled-software/ungoogled-chromium)** – Chromium with all Google-specific web services and background requests stripped out.
-* **No Call Home:** No Google Host Detector, URL Tracker, or Safe Browsing.
-* **Privacy:** Ideal for a clean web experience without the Google ecosystem overhead.
 
 ---
 
 ## Terminal / CLI
 
-**[micro](https://github.com/zyedidia/micro)** – My "normie" editor. It feels like a standard GUI text editor (standard `Ctrl` shortcuts, mouse support) but lives in the shell.
+**[micro](https://micro-editor.github.io/)** – My "normie" terminal text editor. It feels like a standard GUI app (standard `Ctrl` shortcuts, mouse support) but lives in the shell.
 
 **[k9s](https://k9scli.io/)** – Great TUI utility for k8s. Makes navigating clusters and checking logs significantly faster than manual `kubectl` commands.
 

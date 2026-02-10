@@ -1,29 +1,18 @@
-showshow// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "Ubuntu",
+	"name": "Blog Env",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:jammy",
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/haskell:2": {
-			"installHLS": true,
-			"downgradeGhcToSupportHls": true,
-			"adjustBash": true,
-			"ghcVersion": "9.6.4",
-			"cabalVersion": "3.10.3.0",
-			"globalPackages": "hlint hspec pandoc fourmolu"
-		}
-	},
-
+	 "build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash -i .devcontainer/install-dependencies.sh",
-
+	//"postCreateCommand": "bash -i .devcontainer/install-dependencies.sh",
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -36,12 +25,12 @@ showshow// For format details, see https://aka.ms/devcontainer.json. For config 
 				"hoovercj.haskell-linter",
 				"eamodio.gitlens",
 				"editorconfig.editorconfig",
-        		"oderwat.indent-rainbow",
-        		"janw4ld.lambda-black"
+				"oderwat.indent-rainbow",
+				"janw4ld.lambda-black"
 			],
-      "settings": {
-        "workbench.colorTheme": "Lambda Dark+"
-      }
+			"settings": {
+				"workbench.colorTheme": "Lambda Dark+"
+			}
 		}
 	},
 	"portsAttributes": {
@@ -50,8 +39,9 @@ showshow// For format details, see https://aka.ms/devcontainer.json. For config 
 		}
 	},
 	// for linux only , speeds speed
-	 "runArgs": ["--network=host"]
-
+	"runArgs": [
+		"--network=host"
+	]
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
