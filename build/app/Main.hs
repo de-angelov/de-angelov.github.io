@@ -214,8 +214,8 @@ copyStaticFiles = do
   fileMeta <- ask
   
   let 
-    tmpCssDir = "build/tmp/css"
-    tmpJsDir = "build/tmp/js"
+    tmpCssDir = "tmp/css"
+    tmpJsDir = "tmp/js"
     minifiedCssPath = tmpCssDir </> "index.min.css"
     minifiedJsPath = tmpJsDir </> "index.min.js"
 
@@ -232,7 +232,7 @@ copyStaticFiles = do
   let finalJsPath = outputFolder </>  "js" </>  "index" <.> toString (version fileMeta) <.> "js"
   lift $ copyFileChanged minifiedJsPath finalJsPath
 
-  liftIO $ removeDirectoryRecursive "build/tmp"
+  liftIO $ removeDirectoryRecursive "tmp"
 
 
   filepaths <- lift $ getDirectoryFiles "site" ["images//*", "css//*.css", "js//*.js"]
@@ -281,6 +281,7 @@ buildFeed posts' = do
         }
 
 
+sortPostsByDateDesc :: [Post] -> [Post]
 sortPostsByDateDesc =
   let
     parsePostDate :: Post -> UTCTime

@@ -6,7 +6,7 @@
       <meta name="description" content="Personal blog">
       <meta name="author" content="Denis Angelov">
       <meta name=viewport content="width=device-width, initial-scale=1">
-      <title>IIEF in modern JS</title>
+      <title>Sites to Visit</title>
       <link rel="stylesheet" href="/css/reset.css">
       <link rel="stylesheet" href="/css/prism.css">
       <link rel="stylesheet" href="/css/index.41f66150-ef3d-48c7-8128-0b42a45198df.css">
@@ -30,58 +30,23 @@
       <div class="wrapper">
         <div class="masthead">
           <div class="post__tags">
-            Feb 13, 2025 &lt 2025 | JavaScript | FP &gt
+            Feb 10, 2026 &lt 2026 &gt
           </div>
           <h1>
-            IIEF in modern JS 
+            Sites to Visit 
           </h1>
     
         </div>
       </div>
       <article class="post">
-        <p>In modern JavaScript there is one rarely seen feature <a
-href="https://developer.mozilla.org/en-US/docs/Glossary/IIFEs">IIFE</a>.
-Once before ES6, it was heavily used for module encapsulation.</p>
-<p>In my opinion there is actually one nice use for the trusty old IIFE
-even today when functional style has become popular - converting
-imperative statements to an expressions!</p>
-<p>A statement is a complete instruction that tells the computer to
-perform an action. It does not necessarily return a value.</p>
-<pre>
-<code class="language-js">
-    if (x > 5) {  // Conditional statement
-        console.log("x is greater than 5");  // Print statement
-    }    
-</code>
-</pre>
-<p>An expression is any valid combination of values, variables,
-operators, and function calls that produces a value.</p>
-<pre>
-<code class="language-js">
-   const result = x * y + z;   
-</code>
-</pre>
-<p>In functional programming statements are less common because this
-style emphasizes pure functions and immutability. It is all about
-evaluating expressions to produce values.</p>
-<p>One cool trick that Javascript allows, is to use IIFEs to skip
-mutable variables.</p>
-<pre>
-<code class="language-js">
-//using imperative style 
-    let result;
-    if (x < 0) result = "small";
-    if (x === 0) result = "mid";
-    if (x > 0) result = "big";
-
-//using functional style 
-   const result = (() => {
-    if (x < 0) return "small";
-    if (x === 0) return "mid";
-    if (x > 0) return "big";
-   })() 
-</code>
-</pre>
+        <ul>
+<li><strong><a href="https://landchad.net">LandChad.net</a></strong> The
+essential guide for hosting your own website like it's 1999.</li>
+<li><strong><a href="https://digdeeper.club">DigDeeper.net</a></strong>
+Great conspiratorial vibe and interesting privacy related articles.</li>
+<li><strong><a href="https://rpgcodex.net">RPGCodex.net</a></strong>
+Experience the "spirit" of old-school RPG discussion.</li>
+</ul>
         <br>
         <br>
       </article>
