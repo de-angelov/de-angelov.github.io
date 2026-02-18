@@ -33,7 +33,7 @@ date: Feb 02, 2026
 
 ## Design & Graphics
 
-**[Photopea](https://www.photopea.com/)** – A free, web-based alternative to Photoshop. It handles `.psd` files perfectly and runs entirely in the browser
+**[Photopea](https://www.photopea.com/)** – A free, web-based alternative to Photoshop.
 
 
 ---
