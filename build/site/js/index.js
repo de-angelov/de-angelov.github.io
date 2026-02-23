@@ -14,6 +14,16 @@
 		.filter(x => x !== "");
 	}
 
+	function initHeaderIconAnimation() {
+		var el = document.querySelector('.header__icon');
+
+		el.addEventListener('click',function(){
+			el.classList.remove('animate-spring');
+			void el.offsetWidth; // force reflow to restart animation
+			el.classList.add('animate-spring');
+		})
+	}
+
 	function highlightCurrentPage() {
 		var currentPath = window.location.pathname;
 		var selector = "#home";
@@ -106,6 +116,7 @@
 				initMermaidCharts();
 				initFiltering();
 				hideShowFilters();
+				initHeaderIconAnimation();
 				window.addEventListener('popstate', () => { 
 					highlightCurrentPage();
 					hideShowFilters();

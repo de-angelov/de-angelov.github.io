@@ -137,10 +137,26 @@ b {
   justify-self: start;
   align-content: center;
   width: 3rem;
-  border: 1rem solid var(--nav-bg-color);
+  border: 1rem solid transparent;
   height: 3rem; 
   background-image: url("/images/logo.svg");
+  background-repeat: no-repeat;       
+  background-position: center;       
+  background-size: contain;  
+  background-clip: padding-box;   
 }
+
+.animate-spring{
+  animation: animate-spring 0.25s ease;
+}
+
+@keyframes animate-spring {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.25); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
 
 .header__nav {
   box-shadow: var(--shadow);
@@ -303,6 +319,7 @@ b {
       transform: translateY(0);
     }
 }
+
 
 :root {
   --font-size: 1rem;
