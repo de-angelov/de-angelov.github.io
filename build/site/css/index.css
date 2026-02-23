@@ -41,8 +41,12 @@ h1 {
   font-family: 'Roboto Slab', serif;
   color: var(--main-text-color);
   font-size: 3rem;
-  text-align: center;
   margin: 0 0 1rem 0;
+
+  display: inline-flex;  
+  align-items: baseline; 
+  justify-items: center; 
+  align-self: center;
 }
 
 h2, h3, h4, h5, h6 {
@@ -80,19 +84,17 @@ p {
 }
 
 h1::before {
-  content: "< " / "";
+  content: "<" / "";
   color: var(--main-text-color);
   font-weight: bold;
-  /* font-size: 2rem; */
-  position: relative;
-  /* top: 0.3333333333rem; */
+  margin-right: 0.25em;
 }
 
 h1::after {
-  content: " >" / "";
+  content: ">" / "";
   color: var(--main-text-color);
   font-weight: bold;
-  position: relative;
+  margin-left: 0.25em;
 }
 
 footer {
