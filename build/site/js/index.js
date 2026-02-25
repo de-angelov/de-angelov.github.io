@@ -73,10 +73,10 @@
 		}
 
 		window.history.pushState({}, '', currentURL.toString());
-		hideShowFilters();
+		hideShowFilters({ initialFade: true });
 	}
 
-	function hideShowFilters() {
+	function hideShowFilters({ initialFade } = { initialFade: true }) {
 		var currentFilters = getCurrentActiveFilters();
 
 		blogLinks.forEach(function (a) {
@@ -86,6 +86,10 @@
 				currentFilters.some(x => tags.includes(x));
 
 			// a.style.display = hasSelectedFilterTag ? 'inherit' : 'none';
+
+			if(initialFade === false) {
+				return;
+			}
 
 			if(hasSelectedFilterTag) {
 				a.classList.remove('fade-out-effect');
@@ -127,11 +131,11 @@
 				highlightCurrentPage();
 				initMermaidCharts();
 				initFiltering();
-				hideShowFilters();
+				hideShowFilters({ initialFade: false });
 				initHeaderIconAnimation();
 				window.addEventListener('popstate', () => { 
 					highlightCurrentPage();
-					hideShowFilters();
+					hideShowFilters({ initialFade: false });
 				});
 			});
 })();
