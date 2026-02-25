@@ -77,8 +77,6 @@ h4 {
   text-align: left;
 }
 
-
-
 p {
   margin: 0 0 1rem 0 
 }
@@ -144,13 +142,14 @@ b {
   background-position: center;       
   background-size: contain;  
   background-clip: padding-box;   
+  z-index: 2;  
 }
 
-.animate-spring{
-  animation: animate-spring 0.25s ease;
+.spring-effect{
+  animation: spring-effect 0.5s ease;
 }
 
-@keyframes animate-spring {
+@keyframes spring-effect {
   0%   { transform: scale(1); }
   30%  { transform: scale(1.25); }
   60%  { transform: scale(0.95); }
@@ -159,6 +158,8 @@ b {
 
 
 .header__nav {
+  position: relative;
+  overflow: hidden;  
   box-shadow: var(--shadow);
   font-size: 2rem;
   padding: var(--padding) 0;
@@ -168,16 +169,40 @@ b {
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin:auto;
-  box-sizing: border-box;
   height: 5rem;
+  box-sizing: border-box;
+  z-index: 1;   
+}
+
+.shine-effect::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.25) 0%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0.25) 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 0;
+  animation: shine-once 1.5s ease forwards;
+}
+
+@keyframes shine-once {
+  0% { left: -50%; }
+  100% { left: 150%; }
 }
 
 .header__nav a {
   font-family: 'Roboto Slab', serif;
   padding: calc(var(--padding) /2) calc(var(--padding) * 2);
   box-sizing: border-box;
-  
+  z-index: 2;
 }
 
 .header__nav--active{
@@ -306,10 +331,10 @@ b {
   color:var(--primary-color);
 }
 
-.fade-in-up {
+.fade-up-effect {
     opacity: 0;
     transform: translateY(20px);
-    animation: fadeInUp 1s ease-out forwards;
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
 
@@ -319,6 +344,27 @@ b {
       transform: translateY(0);
     }
 }
+
+.fade-out-effect {
+  animation: fadeScaleDown 0.4s ease forwards;
+  pointer-events: none;
+}
+
+.fade-in-effect {
+  animation: fadeScaleUp 0.4s ease forwards;
+  pointer-events: auto;
+}
+
+@keyframes fadeScaleDown {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0); display: none; }
+}
+
+@keyframes fadeScaleUp {
+  0% { opacity: 0; transform: scale(0); display: none; }
+  100%   { opacity: 1; transform: scale(1); }
+}
+
 
 
 :root {

@@ -25,4 +25,12 @@ date: Feb 10, 2026
 *   **[Pexels.com](https://www.pexels.com/)**
     Large library of free photos 
 
+## Free Image Hosting
+
+* **[PostImages.com](https://postimages.org/)**  
+  Simple, free image hosting with direct links for websites and forums.
+
+* **[ImgBB.com](https://imgbb.com/)**  
+  Free drag-and-drop image hosting with hotlink support and direct URLs.
+
 

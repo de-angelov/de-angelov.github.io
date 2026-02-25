@@ -15,12 +15,17 @@
 	}
 
 	function initHeaderIconAnimation() {
-		var el = document.querySelector('.header__icon');
+		var headerIcon = document.querySelector('.header__icon');
+		var header = document.querySelector('.header__nav');
 
-		el.addEventListener('click',function(){
-			el.classList.remove('animate-spring');
-			void el.offsetWidth; // force reflow to restart animation
-			el.classList.add('animate-spring');
+		headerIcon.addEventListener('click',function(){
+			headerIcon.classList.remove('spring-effect');
+			void headerIcon.offsetWidth; // force reflow to restart animation
+			headerIcon.classList.add('spring-effect');
+
+			header.classList.remove('shine-effect');
+			void header.offsetWidth; // force reflow to restart animation
+			header.classList.add('shine-effect');
 		})
 	}
 
@@ -80,7 +85,15 @@
 				currentFilters.length === 0 ||
 				currentFilters.some(x => tags.includes(x));
 
-			a.style.display = hasSelectedFilterTag ? 'inherit' : 'none';
+			// a.style.display = hasSelectedFilterTag ? 'inherit' : 'none';
+
+			if(hasSelectedFilterTag) {
+				a.classList.remove('fade-out-effect');
+				a.classList.add('fade-in-effect');
+			} else {
+				a.classList.remove('fade-in-effect');
+				a.classList.add('fade-out-effect');
+			}
 		});
 
 		if(currentFilters.length === 0) {
@@ -96,7 +109,6 @@
 
 			tagButtons
 				.filter(b => currentFilters.some(function(f) { return f == b.getAttribute(filterDataAttr); }))
-				.map(x => { console.log("currentfilters", x); return x })
 				.forEach(markTagAsSelected);
 		}
 
