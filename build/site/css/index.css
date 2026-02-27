@@ -218,12 +218,6 @@ b {
   /* top: 0.3333333333rem; */
 }
 
-.hero-section__photo {
-    width: 15rem;
-    display: inline-block;
-    transform-origin: center;
-}
-
 .header__nav--active::after {
   content: " >";
   color: var(--primary-color);
@@ -344,7 +338,7 @@ b {
 .home-page__photo{
   max-width:  calc(var(--main-width)/5);
   margin: auto;
-  border-radius: 50%;
+  border-radius: 10%;
   overflow: hidden;
   outline: 1rem solid var(-primary-color);
 }
