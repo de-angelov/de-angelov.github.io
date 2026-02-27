@@ -1,5 +1,5 @@
 ---
-title: "Same App Different Languages"
+title: "Same App, Different Languages"
 tags: ["2026", "FP", "Haskell"]
 date: Feb 27, 2026
 ---
