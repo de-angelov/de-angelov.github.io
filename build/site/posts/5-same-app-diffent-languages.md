@@ -16,18 +16,18 @@ The app includes:
 ---
 
 ## Goal
-The main goal is to **compare Functional Programming (FP) styles and frameworks** across languages.
+The main goal is to **compare Programming styles and frameworks** across languages.
 
 ---
 
-## Implemented:
+## Implemented
 
 ### Scala 3 + ZIO
 **Repository:** https://github.com/de-angelov/scala-user-login
 
 **Tech Stack & Libraries:**
 - **Scala 3** — modern, strongly typed JVM language with functional programming features.
-- **ZIO** — a purely functional effect system & runtime for Scala, offering type‑safe, composable concurrency and resource management (handles effects, asynchronous programming, error handling, and more). :contentReference
+- **ZIO** — a purely functional effect system & runtime for Scala, offering type‑safe, composable concurrency and resource management (handles effects, asynchronous programming, error handling, and more). 
 
 ---
 
@@ -36,13 +36,13 @@ The main goal is to **compare Functional Programming (FP) styles and frameworks*
 
 **Tech Stack & Libraries:**
 - **Haskell** — a purely functional programming language with a strong static type system.
-- **Servant** — a Haskell web framework / type‑level DSL for describing APIs. Routes are defined as types which are then interpreted by the framework to provide servers, client stubs, documentation, etc. :contentReference[oaicite:3]{index=3}
-- **RIO** — a batteries‑included, opinionated Haskell standard library and Prelude replacement, providing common tools (logging, environment management, safe defaults) to make production Haskell code more ergonomic. :contentReference[oaicite:4]{index=4}
+- **Servant** — a Haskell web framework / type‑level DSL for describing APIs. Routes are defined as types which are then interpreted by the framework to provide servers, client stubs, documentation, etc. 
+- **RIO** — a batteries‑included, opinionated Haskell standard library and Prelude replacement, providing common tools (logging, environment management, safe defaults) to make production Haskell code more ergonomic. 
 
 
 ---
 
-## Planned:
+## Planned
 
 - **TypeScript + Effect‑TS** — using a functional effects system in the TypeScript ecosystem.
 

@@ -218,6 +218,12 @@ b {
   /* top: 0.3333333333rem; */
 }
 
+.hero-section__photo {
+    width: 15rem;
+    display: inline-block;
+    transform-origin: center;
+}
+
 .header__nav--active::after {
   content: " >";
   color: var(--primary-color);
@@ -325,11 +331,24 @@ b {
   outline-offset: calc(var(--padding)/2);
 }
 
-.simple-logo{
-  position: relative;
-  font-size:2rem;
-  color:var(--primary-color);
+.home-page__section{
+  max-width:  calc(var(--main-width)/2);
+  margin: auto;
 }
+
+.home-page__section p {
+  text-align: left;
+}
+
+
+.home-page__photo{
+  max-width:  calc(var(--main-width)/5);
+  margin: auto;
+  border-radius: 50%;
+  overflow: hidden;
+  outline: 1rem solid var(-primary-color);
+}
+
 
 .fade-up-effect {
     opacity: 0;
