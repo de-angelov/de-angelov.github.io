@@ -6,7 +6,7 @@
       <meta name="description" content="Personal blog">
       <meta name="author" content="Denis Angelov">
       <meta name=viewport content="width=device-width, initial-scale=1">
-      <title>Hello World</title>
+      <title>Home Lab Setup</title>
       <link rel="stylesheet" href="/css/reset.css">
       <link rel="stylesheet" href="/css/prism.css">
       <link rel="stylesheet" href="/css/index.a87fa680-d681-4a43-a344-a5da2ccf27e1.css">
@@ -30,45 +30,63 @@
       <div class="wrapper">
         <div class="masthead">
           <div class="post__tags">
-            Jan 18, 2025 &lt 2025 | Haskell &gt
+            Mar 2, 2026 &lt 2026 | Linux &gt
           </div>
           <h1 class="fade-up-effect">
-            Hello World 
+            Home Lab Setup 
           </h1>
     
         </div>
       </div>
       <article class="post">
-        <p>Arguably, it might be a bit of overengineering for a simple blog to
-use Haskell. But at least I get programmer cred right?<br />
-But sadly it also has a bit of JS scripting bloat :(</p>
-<p>Details:</p>
+        <h1 id="home-lab-setup">Home Lab Setup</h1>
+<p>Finally decided to get into <strong>homelabbing</strong>! Here's my
+initial setup and plans.</p>
+<hr />
+<h2 id="hardware">Hardware</h2>
+<p><strong>Minisforum EM680</strong><br />
+- 32 GB RAM<br />
+- 1 TB storage<br />
+- Compact, yet powerful small PC</p>
+<hr />
+<h2 id="software--virtualization">Software &amp; Virtualization</h2>
+<p><strong>Proxmox VE</strong> – simulating a cluster of multiple Linux
+machines to run a <strong>Kubernetes cluster</strong>.</p>
+<p>Current plan:<br />
+- Set up a cluster using <strong>k3s</strong> to test Kubernetes
+workloads.</p>
+<hr />
+<h2 id="helpful-resources">Helpful Resources</h2>
 <ul>
-<li><p>Uses Haskell site generator <a
-href="https://github.com/ChrisPenner/slick">Slick</a></p></li>
-<li><p><a href="https://taskfile.dev/">Task</a> simple task
-runner</p></li>
-<li><p><a href="https://mermaid.js.org/">Mermaid diagrams</a> markdown
-extensions</p></li>
-<li><p><a href="https://mermaid.js.org/">Prism</a> syntax
-highlighter</p></li>
-<li><p>The site background comes from <a
-href="https://heropatterns.com/">Hero Patterns</a></p></li>
+<li><a
+href="https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install">Community
+Scripts for Proxmox VE</a><br />
+</li>
+<li><a href="https://k3s.io/">Kubernetes (k3s)</a></li>
 </ul>
-<p>Examples:</p>
-<pre>
-    <code class="language-js">
-    () => { console.log(10);}
-    </code>
+<hr />
+<h2 id="recommended-youtube-videos">Recommended YouTube Videos</h2>
+<div style="display:flex; gap:1rem; flex-wrap:wrap;">
 
-    <p class="mermaid">
-    graph TD;
-        A[Square Rect] -- Link text --> B((Circle))
-        A --> C(Round Rect)
-        B --> D{Rhombus}
-        C --> D
-    </p>
-</pre>
+<div style="flex:1; min-width:300px; aspect-ratio:16/9;">
+  <iframe
+    src="https://www.youtube.com/embed/r3nY_X-5vJU"
+    title="Minisforum EM680: A Liliputian Powerhouse"
+    style="width:100%; height:100%; border:0;"
+    allowfullscreen>
+  </iframe>
+</div>
+
+<div style="flex:1; min-width:300px; aspect-ratio:16/9;">
+  <iframe
+    src="https://www.youtube.com/embed/kcpu4z5eSEU"
+    title="Proxmox Automation with Proxmox Helper Scripts!"
+    style="width:100%; height:100%; border:0;"
+    allowfullscreen>
+  </iframe>
+</div>
+
+</div>
         <br>
         <br>
       </article>
