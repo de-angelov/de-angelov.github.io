@@ -6,7 +6,7 @@ date: Mar 2, 2026
 
 # Home Lab Setup
 
-Finally decided to get into **homelabbing**! Here's my initial setup and plans.  
+Finally decided to create my own **homelab**
 
 ---
 
