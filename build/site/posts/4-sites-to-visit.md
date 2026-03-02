@@ -29,8 +29,10 @@ date: Feb 10, 2026
 
 * **[PostImages.com](https://postimages.org/)**  
   Simple, free image hosting with direct links for websites and forums.
-
 * **[ImgBB.com](https://imgbb.com/)**  
   Free drag-and-drop image hosting with hotlink support and direct URLs.
 
+## Emoticons 
 
+* **[Emojipedia.com](https://emojipedia.org/en/search?q=brain/)**  
+* **[EmojiCopy.com](https://emojicopy.com/)**  
