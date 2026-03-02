@@ -22,11 +22,9 @@ Finally decided to create my own **homelab**
 ## Software & Virtualization
 
 **Proxmox VE** – simulating a cluster of multiple Linux machines to run a **Kubernetes cluster**.  
+ 
+**k3s** lightweight k3s cluster for testing stuff 
 
-Current plan:  
-- Set up a cluster using **k3s** to test Kubernetes workloads.  
-
----
 
 ## Helpful Resources
 - [Community Scripts for Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install)  
