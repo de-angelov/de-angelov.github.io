@@ -5,26 +5,28 @@
 	var tagButtons = [];
 	var blogLinks = [];
 
-	function markTagAsSelected(b){ b.classList.add('tag-list__tag--selected') };
+	function markTagAsSelected(b) { b.classList.add('tag-list__tag--selected') };
 	function markTagAsDeselected(b) { b.classList.remove('tag-list__tag--selected'); };
-	function getCurrentActiveFilters() { 
+
+	function getCurrentActiveFilters() {
 		var currentURL = new URL(window.location.href);
-		return  (currentURL.searchParams.get(filterParamName) || "")
-		.split(',')
-		.filter(x => x !== "");
+		return (currentURL.searchParams.get(filterParamName) || "")
+			.split(',')
+			.filter(x => x !== "");
 	}
 
 	function initHeaderIconAnimation() {
 		var headerIcon = document.querySelector('.header__icon');
 		var header = document.querySelector('.header__nav');
+		if (!headerIcon) return;
 
-		headerIcon.addEventListener('click',function(){
+		headerIcon.addEventListener('click', function () {
 			headerIcon.classList.remove('spring-effect');
-			void headerIcon.offsetWidth; // force reflow to restart animation
+			void headerIcon.offsetWidth;
 			headerIcon.classList.add('spring-effect');
 
 			header.classList.remove('shine-effect');
-			void header.offsetWidth; // force reflow to restart animation
+			void header.offsetWidth;
 			header.classList.add('shine-effect');
 		})
 	}
@@ -32,41 +34,32 @@
 	function highlightCurrentPage() {
 		var currentPath = window.location.pathname;
 		var selector = "#home";
-
-		if (currentPath.includes("cv.html")) {
-			selector = "#cv";
-		}	
-
-		if (currentPath.includes("blog.html") || currentPath.includes("posts/")) {
-			selector = "#blog";
-		}
+		if (currentPath.includes("cv.html")) selector = "#cv";
+		if (currentPath.includes("blog.html") || currentPath.includes("posts/")) selector = "#blog";
 
 		var activeElement = document.querySelector(selector);
-	
 		if (activeElement) {
 			activeElement.classList.add("header__nav--active");
-		
 			activeElement.setAttribute("aria-current", "page");
 		}
 	}
 
 	function initMermaidCharts() {
-		mermaid && mermaid.initialize({ startOnLoad: true });
+		if (typeof mermaid !== 'undefined') {
+			mermaid.initialize({ startOnLoad: true });
+		}
 	}
 
-	
 	function handleFilterClick(e) {
 		var currentURL = new URL(window.location.href);
-		
 		var filterValue = e.currentTarget.getAttribute(filterDataAttr);
-		
 		var currentFilters = getCurrentActiveFilters();
 
 		var updatedFilters = currentFilters.includes(filterValue)
 			? currentFilters.filter(function (x) { return x !== filterValue })
 			: [...currentFilters, filterValue];
-		
-		if(filterValue === 'all' || updatedFilters.length === 0){
+
+		if (filterValue === 'all' || updatedFilters.length === 0) {
 			currentURL.searchParams.delete(filterParamName);
 		} else {
 			currentURL.searchParams.set(filterParamName, updatedFilters.join(','));
@@ -76,66 +69,85 @@
 		hideShowFilters({ initialFade: true });
 	}
 
-	function hideShowFilters({ initialFade } = { initialFade: true }) {
-		var currentFilters = getCurrentActiveFilters();
 
-		blogLinks.forEach(function (a) {
-			var tags = a.getAttribute('data-tags').split(',')
-			var hasSelectedFilterTag = 
-				currentFilters.length === 0 ||
-				currentFilters.some(x => tags.includes(x));
+	async function hideShowFilters({ initialFade = true } = {}) {
+		const currentFilters = getCurrentActiveFilters();
+		const toShow = [];
+		const toHide = [];
 
-			// a.style.display = hasSelectedFilterTag ? 'inherit' : 'none';
-
-			if(initialFade === false) {
-				return;
+		const onDone = (e) => {
+			if (e.animationName === 'fadeScaleDown') {
+				el.style.display = 'none';
+				el.removeEventListener('animationend', onDone);
+				resolve();
 			}
+		};
 
-			if(hasSelectedFilterTag) {
-				a.classList.remove('fade-out-effect');
-				a.classList.add('fade-in-effect');
-			} else {
-				a.classList.remove('fade-in-effect');
-				a.classList.add('fade-out-effect');
-			}
+		const fadeOut = (el) => new Promise(resolve => {
+			el.classList.remove('fade-in-effect');
+			el.classList.add('fade-out-effect');
+
+
+			el.addEventListener('animationend', onDone);
+			setTimeout(() => { el.style.display = 'none'; resolve(); }, 500); // Fallback
 		});
 
-		if(currentFilters.length === 0) {
-			tagButtons
-				.forEach(markTagAsDeselected);
-
-			tagButtons
-				.filter(b => b.getAttribute(filterDataAttr) === 'all')
-				.forEach(markTagAsSelected);
-		} else {
-			tagButtons
-				.forEach(markTagAsDeselected);
-
-			tagButtons
-				.filter(b => currentFilters.some(function(f) { return f == b.getAttribute(filterDataAttr); }))
-				.forEach(markTagAsSelected);
+		if (!initialFade) {
+			blogLinks.forEach(a => {
+				const tags = a.getAttribute('data-tags').split(',');
+				const hasMatch = currentFilters.length === 0 || currentFilters.some(x => tags.includes(x));
+				a.style.display = hasMatch ? 'inherit' : 'none';
+				a.classList.remove('fade-out-effect', 'fade-in-effect');
+			});
+			updateTagButtonUI(currentFilters);
+			return;
 		}
 
+		blogLinks.forEach(a => {
+			const tags = a.getAttribute('data-tags').split(',');
+			const hasMatch = currentFilters.length === 0 || currentFilters.some(x => tags.includes(x));
+			const isVisible = a.style.display !== 'none';
+
+			if (hasMatch && !isVisible) toShow.push(a);
+			if (!hasMatch && isVisible) toHide.push(a);
+		});
+
+		if (toHide.length > 0) {
+			await Promise.all(toHide.map(fadeOut));
+		}
+
+		toShow.forEach(a => {
+			a.style.display = 'inherit';
+			void a.offsetWidth;
+			a.classList.remove('fade-out-effect');
+			a.classList.add('fade-in-effect');
+		});
+
+		updateTagButtonUI(currentFilters);
 	}
 
+	function updateTagButtonUI(currentFilters) {
+		const activeTags = currentFilters.length === 0 ? ['all'] : currentFilters;
+		tagButtons.forEach(b => {
+			const val = b.getAttribute(filterDataAttr);
+			activeTags.includes(val) ? markTagAsSelected(b) : markTagAsDeselected(b);
+		});
+	}
 	function initFiltering() {
 		tagButtons = Array.from(document.querySelectorAll('.tag-list__tag'));
 		blogLinks = Array.from(document.querySelectorAll('.post__list_link'));
 		tagButtons.forEach(function (b) { b.addEventListener('click', handleFilterClick) });
 	}
 
-	document
-		.addEventListener(
-			"DOMContentLoaded",
-			function () {
-				highlightCurrentPage();
-				initMermaidCharts();
-				initFiltering();
-				hideShowFilters({ initialFade: false });
-				initHeaderIconAnimation();
-				window.addEventListener('popstate', () => { 
-					highlightCurrentPage();
-					hideShowFilters({ initialFade: false });
-				});
-			});
+	document.addEventListener("DOMContentLoaded", function () {
+		highlightCurrentPage();
+		initMermaidCharts();
+		initFiltering();
+		hideShowFilters({ initialFade: false });
+		initHeaderIconAnimation();
+		window.addEventListener('popstate', () => {
+			highlightCurrentPage();
+			hideShowFilters({ initialFade: false });
+		});
+	});
 })();

@@ -7,7 +7,21 @@
   </author>
 
   <entry>
-      <title>Same App Different Languages</title>
+      <title>Home Lab Setup</title>
+      <updated>2026-03-02T00:00:00Z</updated>
+      <category term="2026"/>
+      <category term="Linux"/>
+      <link>https://denisangelov.xyz/posts/6-home-lab.html/</link>
+  </entry>
+  <entry>
+      <title>SSH Utilities Cheat Sheet</title>
+      <updated>2026-03-02T00:00:00Z</updated>
+      <category term="2026"/>
+      <category term="Linux"/>
+      <link>https://denisangelov.xyz/posts/7-ssh.html/</link>
+  </entry>
+  <entry>
+      <title>Same App, Different Languages</title>
       <updated>2026-02-27T00:00:00Z</updated>
       <category term="2026"/>
       <category term="FP"/>
