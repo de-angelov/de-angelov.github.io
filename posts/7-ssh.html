@@ -9,7 +9,7 @@
       <title>SSH Utilities Cheat Sheet</title>
       <link rel="stylesheet" href="/css/reset.css">
       <link rel="stylesheet" href="/css/prism.css">
-      <link rel="stylesheet" href="/css/index.2919bb8c-9ba1-4b77-9dec-32ba824d4200.css">
+      <link rel="stylesheet" href="/css/index.d18eef91-e253-4965-b865-318461d5128e.css">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   </head>  <body>
@@ -69,7 +69,6 @@ ssh -R 9090:localhost:3000 user@host
 ssh -D 1080 user@host
 </code>
 </pre>
-<hr />
 <h3 id="ssh-keygen--key-management"><code>ssh-keygen</code> — Key
 Management</h3>
 <p>Generate modern key:</p>
@@ -85,7 +84,6 @@ ssh-keygen -l -f id_ed25519.pub   # fingerprint
 ssh-keygen -R hostname            # remove host from known_hosts
 </code>
 </pre>
-<hr />
 <h3 id="ssh-copy-id--install-public-key"><code>ssh-copy-id</code> —
 Install Public Key</h3>
 <p>Copies your public key to a remote host’s
@@ -98,7 +96,6 @@ ssh-copy-id -p 2222 user@host
 </code>
 </pre>
 <p>👉 Only copies <strong>public keys</strong>, never private keys.</p>
-<hr />
 <h2 id="open_file_folder-file-transfer-utilities">📂 File Transfer
 Utilities</h2>
 <h3 id="scp--secure-copy"><code>scp</code> — Secure Copy</h3>
@@ -109,7 +106,6 @@ scp -r folder user@host:/remote/path
 scp user@host:/remote/file.txt .
 </code>
 </pre>
-<hr />
 <h3 id="sftp--interactive-file-transfer"><code>sftp</code> — Interactive
 File Transfer</h3>
 <pre>
@@ -126,7 +122,6 @@ ls
 cd
 </code>
 </pre>
-<hr />
 <h3 id="rsync-over-ssh--efficient-sync"><code>rsync</code> over SSH —
 Efficient Sync</h3>
 <pre>
@@ -135,7 +130,6 @@ rsync -avz -e ssh folder/ user@host:/remote/folder
 </code>
 </pre>
 <p>Efficient for backups and deployments.</p>
-<hr />
 <h2 id="key-ssh-agent-utilities">🔑 SSH Agent Utilities</h2>
 <h3 id="ssh-agent--background-key-manager"><code>ssh-agent</code> —
 Background Key Manager</h3>
@@ -144,7 +138,6 @@ Background Key Manager</h3>
 eval "$(ssh-agent -s)"
 </code>
 </pre>
-<hr />
 <h3 id="ssh-add--load-keys-into-agent"><code>ssh-add</code> — Load Keys
 Into Agent</h3>
 <pre>
@@ -155,7 +148,6 @@ ssh-add -D
 </code>
 </pre>
 <p>Prevents repeated passphrase prompts.</p>
-<hr />
 <h2 id="gear-server-side-utilities">⚙️ Server-Side Utilities</h2>
 <h3 id="sshd--ssh-daemon"><code>sshd</code> — SSH Daemon</h3>
 <p>Check status:</p>
@@ -176,7 +168,6 @@ sudo systemctl restart sshd
 /etc/ssh/sshd_config
 </code>
 </pre>
-<hr />
 <h2 id="-important-ssh-files">🗂 Important SSH Files</h2>
 <p>Local (<code>~/.ssh/</code>):</p>
 <ul>
@@ -196,7 +187,6 @@ chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
 </code>
 </pre>
-<hr />
 <h2 id="brain-useful-power-tricks">🧠 Useful Power Tricks</h2>
 <h3 id="jump-host-bastion">Jump Host (Bastion)</h3>
 <pre>
@@ -204,7 +194,6 @@ chmod 600 ~/.ssh/authorized_keys
 ssh -J user@jump user@internal-host
 </code>
 </pre>
-<hr />
 <h3 id="ssh-config-aliases">SSH Config Aliases</h3>
 <p><code>~/.ssh/config</code>:</p>
 <pre>
@@ -222,7 +211,6 @@ Host prod
 ssh prod
 </code>
 </pre>
-<hr />
 <h2 id="closed_lock_with_key-minimal-secure-setup-checklist">🔐 Minimal
 Secure Setup Checklist</h2>
 <ul>
@@ -248,8 +236,8 @@ graph TD;
     <footer>
       © 2026  Denis Angelov. All rights reserved.
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
-    <script src="/js/index.2919bb8c-9ba1-4b77-9dec-32ba824d4200.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="/js/index.d18eef91-e253-4965-b865-318461d5128e.js"></script>
     <script src="/js/prism.js"></script>  </div>
   </body>
 </html>
