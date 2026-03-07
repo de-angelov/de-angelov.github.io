@@ -4,18 +4,15 @@ tags: ["2026", "Linux"]
 date: Mar 2, 2026
 ---
 
-Finally decided to create my own **homelab**
+Finally decided to create my own homelab and bought **Minisforum EM680**
 
----
 
-## Hardware
+<img src="https://i.shgcdn.com/6d29ba68-783c-433b-9cab-b9f9562e86b2/-/format/auto/-/preview/3000x3000/-/quality/lighter/" width="auto" height="" alt="" class="shogun-image" decoding="async" loading="eager">
 
-**Minisforum EM680**  
+## EM680 Spec
 - 32 GB RAM  
 - 1 TB SSD   
 - AMD Ryzen 7 6800U
-
----
 
 ## Software
 
@@ -24,7 +21,9 @@ Finally decided to create my own **homelab**
 **k3s** - lightweight kubernetes cluster for testing stuff 
 
 ## Helpful Resources
-- [Community Scripts for Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install)   
+- [Community Scripts for Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install)  
+
+---
  
 ## Recommended YouTube Videos
 
