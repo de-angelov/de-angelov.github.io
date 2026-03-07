@@ -4,8 +4,6 @@ tags: ["2026", "Linux"]
 date: Mar 2, 2026
 ---
 
-# Home Lab Setup
-
 Finally decided to create my own **homelab**
 
 ---

@@ -39,8 +39,6 @@ ssh -D 1080 user@host
 </code>
 </pre>
 
----
-
 ### `ssh-keygen` — Key Management
 
 Generate modern key:
@@ -60,8 +58,6 @@ ssh-keygen -R hostname            # remove host from known_hosts
 </code>
 </pre>
 
----
-
 ### `ssh-copy-id` — Install Public Key
 
 Copies your public key to a remote host’s `authorized_keys`.
@@ -76,7 +72,6 @@ ssh-copy-id -p 2222 user@host
 
 👉 Only copies **public keys**, never private keys.
 
----
 
 ## 📂 File Transfer Utilities
 
@@ -90,7 +85,6 @@ scp user@host:/remote/file.txt .
 </code>
 </pre>
 
----
 
 ### `sftp` — Interactive File Transfer
 
@@ -111,7 +105,6 @@ cd
 </code>
 </pre>
 
----
 
 ### `rsync` over SSH — Efficient Sync
 
@@ -123,7 +116,6 @@ rsync -avz -e ssh folder/ user@host:/remote/folder
 
 Efficient for backups and deployments.
 
----
 
 ## 🔑 SSH Agent Utilities
 
@@ -134,8 +126,6 @@ Efficient for backups and deployments.
 eval "$(ssh-agent -s)"
 </code>
 </pre>
-
----
 
 ### `ssh-add` — Load Keys Into Agent
 
@@ -148,8 +138,6 @@ ssh-add -D
 </pre>
 
 Prevents repeated passphrase prompts.
-
----
 
 ## ⚙️ Server-Side Utilities
 
@@ -179,7 +167,6 @@ Main config file:
 </code>
 </pre>
 
----
 
 ## 🗂 Important SSH Files
 
@@ -203,7 +190,6 @@ chmod 600 ~/.ssh/authorized_keys
 </code>
 </pre>
 
----
 
 ## 🧠 Useful Power Tricks
 
@@ -215,7 +201,6 @@ ssh -J user@jump user@internal-host
 </code>
 </pre>
 
----
 
 ### SSH Config Aliases
 
@@ -239,7 +224,7 @@ ssh prod
 </code>
 </pre>
 
----
+
 
 ## 🔐 Minimal Secure Setup Checklist
 
@@ -249,6 +234,7 @@ ssh prod
 - Use non-standard port (optional)
 - Use fail2ban (optional)
 - Restrict users via `AllowUsers`
+
 
 ---
 
