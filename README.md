@@ -28,4 +28,4 @@ Commands defined in `Taskfile.yaml`:
 | `task build:app`  | `task ba` | Compiles the Haskell generator application |
 
 ## CI/CD
-Pushes to `main` trigger `.github/workflows/deploy.yml`, which compiles the Haskell binary, generates `build/docs/`, and publishes directly to GitHub Pages.
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which deploys `build/docs/` directly to GitHub Pages.
