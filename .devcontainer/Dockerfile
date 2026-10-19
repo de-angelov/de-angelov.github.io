@@ -45,4 +45,4 @@ RUN ghcup install ghc 9.6.7 \
     && ghcup set ghc 9.6.7 
 
 RUN cabal install hlint-3.8 \
-    && cabal install ormolu-0.7.8.0
+    && cabal install ormolu-0.7.7.0

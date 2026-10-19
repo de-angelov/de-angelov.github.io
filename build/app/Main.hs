@@ -18,7 +18,8 @@ import Development.Shake.FilePath ( (-<.>), (</>), (<.>), dropDirectory1, takeFi
 -- import Development.Shake.Forward (cacheAction, shakeArgsForward)
 import Development.Shake.Classes (Binary)
 import Data.UUID (UUID, toString, toText)
-import Data.UUID.V4 (nextRandom)
+import Data.UUID.V5 (generateNamed, namespaceURL)
+import qualified RIO.ByteString as BS
 import System.Directory (createDirectoryIfMissing, removeDirectoryRecursive)
 import Prelude(putStrLn)
 import RIO.Time (UTCTime, parseTimeOrError, defaultTimeLocale, iso8601DateFormat, formatTime, getCurrentTime)
@@ -223,8 +224,8 @@ copyStaticFiles = do
   liftIO $ createDirectoryIfMissing True tmpJsDir
 
 
-  lift $ cmd_ ("/usr/bin/esbuild" :: String) ("site/css/index.css" :: String) ("--minify" :: String) ("--outfile=" <> minifiedCssPath)
-  lift $ cmd_ ("/usr/bin/esbuild" :: String) ("site/js/index.js" :: String)  ("--minify" :: String) ("--outfile=" <> minifiedJsPath)
+  lift $ cmd_ ("esbuild" :: String) ("site/css/index.css" :: String) ("--minify" :: String) ("--outfile=" <> minifiedCssPath)
+  lift $ cmd_ ("esbuild" :: String) ("site/js/index.js" :: String)  ("--minify" :: String) ("--outfile=" <> minifiedJsPath)
 
   let finalCssPath = outputFolder </>  "css" </> "index" <.> toString (version fileMeta) <.> "css"
   lift $ copyFileChanged minifiedCssPath finalCssPath
@@ -311,9 +312,11 @@ buildRules = do
 
 main :: IO ()
 main = do
-    -- Generate a new UUID for this build
-    guid <- nextRandom
-    let fileMeta = FileMeta { version = guid }
+    -- Generate deterministic asset version based on CSS and JS content
+    cssBytes <- BS.readFile "site/css/index.css"
+    jsBytes <- BS.readFile "site/js/index.js"
+    let assetVersion = generateNamed namespaceURL (BS.unpack (cssBytes <> jsBytes))
+        fileMeta = FileMeta { version = assetVersion }
 
     -- Shake options
     let 

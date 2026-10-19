@@ -9,7 +9,7 @@ tasks:
     silent: true 
   serve:site:
     cmds:
-      - python3 -m http.server 8000 --directory /workspaces/de-angelov.github.io/build/docs/
+      - python3 -m http.server 8000 --directory ./build/docs/
     aliases:
       - ss
   build:site:
