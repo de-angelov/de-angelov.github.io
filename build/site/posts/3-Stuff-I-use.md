@@ -27,6 +27,8 @@ date: Feb 02, 2026
 
 **[k9s](https://k9scli.io/)** – Great TUI utility for k8s. Makes navigating clusters and checking logs significantly faster than manual `kubectl` commands.
 
+**[opencode](https://opencode.ai/)** – Open-source AI coding agent that lives in the terminal. It has a polished TUI, supports multiple model providers, and keeps the whole coding workflow in the shell.
+
 **[tilix](https://gnunn1.github.io/tilix-web/)** - Terminal emulator that follows the Gnome Human Interface Guidelines.
 
 ---

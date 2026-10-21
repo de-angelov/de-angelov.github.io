@@ -1,5 +1,5 @@
 ---
-title: "Books I've Read"
+title: "Library"
 tags: ["2026", "Hobbies"]
 date: Oct 20, 2026
 ---
@@ -19,6 +19,15 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *Use of Weapons* — Iain M. Banks. Banks is a great writer and very pleasant to read. I rushed through it too quickly because of that.
 - *The Forever War* — Joe Haldeman. Great and to the point 
 - *Foundation* series — Isaac Asimov. I like history books so naturally enjoyed its future pseudo history style  
+- *Consider Phlebas* — Iain M. Banks.
+- *The Player of Games* — Iain M. Banks.
+- *The Plague* — Albert Camus.
+- *Rendezvous with Rama* — Arthur C. Clarke.
+- *Ubik* — Philip K. Dick.
+- *The Name of the Rose* — Umberto Eco.
+- *Shadow & Claw* — Gene Wolfe.
+- *Sword & Citadel* — Gene Wolfe.
+- *Starship Troopers* — Robert A. Heinlein.
 
 ## Non-fiction
 
@@ -27,6 +36,10 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *100 Go Mistakes and How to Avoid Them* — Teiva Harsanyi.  I did not get to write much Go by hand before LLMs arrived oh well. Recommended.
 - *Scala for the Impatient* — Cay S. Horstmann. A useful introduction that helped me get started.
 - *Multithreaded JavaScript* — Thomas Hunter II and Bryan English. I learned some things that I never got to use outside interviews.
+- *Designing Data-Intensive Applications* — Martin Kleppmann. The author's lectures on the subject are available [here](https://www.youtube.com/watch?v=UEAMfLPZZhE&list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB).
+- *Domain Modeling Made Functional: Tackle Software Complexity with Domain-Driven Design and F#* — Scott Wlaschin.
+- *Database Internals* — Alex Petrov.
+- *Software Architecture: The Hard Parts* — Neal Ford, Mark Richards, Pramod Sadalage, and Zhamak Dehghani.
 
 
 ### History 
@@ -38,9 +51,13 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *1812: Napoleon's Fatal March on Moscow* — Adam Zamoyski. Very nicely written. The attention to Polish episodes was cute, and it gave me a more historical overview of *War and Peace*.
 - *The Old World in the New* — Edward Alsworth Ross. An archaic sociology book from the early twentieth century, but I still liked the author's style.
 - *The Huns* — Hyun Jin Kim. I didn't like author's prose.
+- *Fire and Blood: A History of Mexico* — T. R. Fehrenbach.
 
  
 ### Other 
 
 - *Man and His Symbols* — Carl G. Jung. It seems that thinking a lot about dreams gives you really cool dreams. Jung's paintings are interesting too.
 - *Storm of Steel* — Ernst Jünger. Surreal in its brutality. I need to read more by Jünger to see how his life developed after the war.
+- *Capitalism, Socialism and Democracy* — Joseph Schumpeter.
+- *The Origin of Consciousness in the Breakdown of the Bicameral Mind* — Julian Jaynes.
+- *Industrial Society and Its Future* — Theodore Kaczynski.
