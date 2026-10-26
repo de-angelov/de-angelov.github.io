@@ -1,20 +1,30 @@
 ---
-title: "SSH Utilities Cheat Sheet"
+title: "Cheat Sheet"
 tags: ["2026", "Linux"]
 date: Mar 2, 2026
 ---
 
-Secure Shell (SSH) is most commonly implemented via OpenSSH, the standard open-source SSH suite on Linux and macOS systems.
+A growing collection of commands and snippets I use regularly. Expand a topic below to see the details.
 
-This post is a practical cheat sheet of core SSH commands **and related utilities like `ssh-copy-id`**, focused on daily sysadmin and developer workflows.
+<details>
+<summary>SSH</summary>
 
----
+<p>Secure Shell (SSH) is most commonly implemented via OpenSSH, the standard open-source SSH suite on Linux and macOS systems.</p>
 
-## 🔐 Core SSH Commands
+<h3>How SSH Works</h3>
 
-### `ssh` — Remote Login
+<p class="mermaid">
+graph TD;
+    A[Local Machine] -->|Private Key| B(SSH Client);
+    B -->|Encrypted Channel| C[Remote SSH Server];
+    C -->|authorized_keys| D(User Account);
+</p>
 
-Connect to a remote machine:
+<h3>Core Commands</h3>
+
+<h4><code>ssh</code> — Remote Login</h4>
+
+<p>Connect to a remote machine:</p>
 
 <pre>
 <code class="language-bash">
@@ -24,7 +34,7 @@ ssh -i ~/.ssh/id_ed25519 user@host
 </code>
 </pre>
 
-Port forwarding examples:
+<p>Port forwarding examples:</p>
 
 <pre>
 <code class="language-bash">
@@ -39,9 +49,11 @@ ssh -D 1080 user@host
 </code>
 </pre>
 
-### `ssh-keygen` — Key Management
+<h3>Keys &amp; Agent</h3>
 
-Generate modern key:
+<h4><code>ssh-keygen</code> — Key Management</h4>
+
+<p>Generate a modern key:</p>
 
 <pre>
 <code class="language-bash">
@@ -49,7 +61,7 @@ ssh-keygen -t ed25519 -C "you@example.com"
 </code>
 </pre>
 
-Other useful operations:
+<p>Other useful operations:</p>
 
 <pre>
 <code class="language-bash">
@@ -58,9 +70,9 @@ ssh-keygen -R hostname            # remove host from known_hosts
 </code>
 </pre>
 
-### `ssh-copy-id` — Install Public Key
+<h4><code>ssh-copy-id</code> — Install Public Key</h4>
 
-Copies your public key to a remote host’s `authorized_keys`.
+<p>Copies your public key to a remote host’s <code>authorized_keys</code>.</p>
 
 <pre>
 <code class="language-bash">
@@ -70,12 +82,57 @@ ssh-copy-id -p 2222 user@host
 </code>
 </pre>
 
-👉 Only copies **public keys**, never private keys.
+<p>👉 Only copies <strong>public keys</strong>, never private keys.</p>
 
+<h4><code>ssh-agent</code> — Background Key Manager</h4>
 
-## 📂 File Transfer Utilities
+<pre>
+<code class="language-bash">
+eval "$(ssh-agent -s)"
+</code>
+</pre>
 
-### `scp` — Secure Copy
+<h4><code>ssh-add</code> — Load Keys Into Agent</h4>
+
+<pre>
+<code class="language-bash">
+ssh-add ~/.ssh/id_ed25519
+ssh-add -l
+ssh-add -D
+</code>
+</pre>
+
+<p>Prevents repeated passphrase prompts.</p>
+
+<h4>Important SSH Files</h4>
+
+<p>Local (<code>~/.ssh/</code>):</p>
+
+<ul>
+<li><code>id_ed25519</code> → private key</li>
+<li><code>id_ed25519.pub</code> → public key</li>
+<li><code>known_hosts</code> → trusted hosts</li>
+<li><code>config</code> → client shortcuts</li>
+</ul>
+
+<p>Remote:</p>
+
+<ul>
+<li><code>~/.ssh/authorized_keys</code> → allowed public keys</li>
+</ul>
+
+<p>Correct permissions matter:</p>
+
+<pre>
+<code class="language-bash">
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+</code>
+</pre>
+
+<h3>File Transfer</h3>
+
+<h4><code>scp</code> — Secure Copy</h4>
 
 <pre>
 <code class="language-bash">
@@ -85,8 +142,7 @@ scp user@host:/remote/file.txt .
 </code>
 </pre>
 
-
-### `sftp` — Interactive File Transfer
+<h4><code>sftp</code> — Interactive File Transfer</h4>
 
 <pre>
 <code class="language-bash">
@@ -94,7 +150,7 @@ sftp user@host
 </code>
 </pre>
 
-Inside session:
+<p>Inside a session:</p>
 
 <pre>
 <code class="language-bash">
@@ -105,8 +161,7 @@ cd
 </code>
 </pre>
 
-
-### `rsync` over SSH — Efficient Sync
+<h4><code>rsync</code> over SSH — Efficient Sync</h4>
 
 <pre>
 <code class="language-bash">
@@ -114,36 +169,13 @@ rsync -avz -e ssh folder/ user@host:/remote/folder
 </code>
 </pre>
 
-Efficient for backups and deployments.
+<p>Efficient for backups and deployments.</p>
 
+<h3>Server</h3>
 
-## 🔑 SSH Agent Utilities
+<h4><code>sshd</code> — SSH Daemon</h4>
 
-### `ssh-agent` — Background Key Manager
-
-<pre>
-<code class="language-bash">
-eval "$(ssh-agent -s)"
-</code>
-</pre>
-
-### `ssh-add` — Load Keys Into Agent
-
-<pre>
-<code class="language-bash">
-ssh-add ~/.ssh/id_ed25519
-ssh-add -l
-ssh-add -D
-</code>
-</pre>
-
-Prevents repeated passphrase prompts.
-
-## ⚙️ Server-Side Utilities
-
-### `sshd` — SSH Daemon
-
-Check status:
+<p>Check status:</p>
 
 <pre>
 <code class="language-bash">
@@ -151,7 +183,7 @@ systemctl status sshd
 </code>
 </pre>
 
-Restart:
+<p>Restart:</p>
 
 <pre>
 <code class="language-bash">
@@ -159,7 +191,7 @@ sudo systemctl restart sshd
 </code>
 </pre>
 
-Main config file:
+<p>Main config file:</p>
 
 <pre>
 <code class="language-bash">
@@ -167,33 +199,9 @@ Main config file:
 </code>
 </pre>
 
+<h3>Power Tricks</h3>
 
-## 🗂 Important SSH Files
-
-Local (`~/.ssh/`):
-
-- `id_ed25519` → private key
-- `id_ed25519.pub` → public key
-- `known_hosts` → trusted hosts
-- `config` → client shortcuts
-
-Remote:
-
-- `~/.ssh/authorized_keys` → allowed public keys
-
-Correct permissions matter:
-
-<pre>
-<code class="language-bash">
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/authorized_keys
-</code>
-</pre>
-
-
-## 🧠 Useful Power Tricks
-
-### Jump Host (Bastion)
+<h4>Jump Host (Bastion)</h4>
 
 <pre>
 <code class="language-bash">
@@ -201,10 +209,9 @@ ssh -J user@jump user@internal-host
 </code>
 </pre>
 
+<h4>SSH Config Aliases</h4>
 
-### SSH Config Aliases
-
-`~/.ssh/config`:
+<p><code>~/.ssh/config</code>:</p>
 
 <pre>
 <code class="language-bash">
@@ -216,7 +223,7 @@ Host prod
 </code>
 </pre>
 
-Then simply:
+<p>Then simply:</p>
 
 <pre>
 <code class="language-bash">
@@ -224,25 +231,15 @@ ssh prod
 </code>
 </pre>
 
+<h3>Security Checklist</h3>
 
+<ul>
+<li>Use <code>ed25519</code> keys</li>
+<li>Disable password authentication</li>
+<li>Disable root login</li>
+<li>Use a non-standard port (optional)</li>
+<li>Use fail2ban (optional)</li>
+<li>Restrict users via <code>AllowUsers</code></li>
+</ul>
 
-## 🔐 Minimal Secure Setup Checklist
-
-- Use `ed25519` keys
-- Disable password authentication
-- Disable root login
-- Use non-standard port (optional)
-- Use fail2ban (optional)
-- Restrict users via `AllowUsers`
-
-
----
-
-## 🧩 Mental Model
-
-<p class="mermaid">
-graph TD;
-    A[Local Machine] -->|Private Key| B(SSH Client);
-    B -->|Encrypted Channel| C[Remote SSH Server];
-    C -->|authorized_keys| D(User Account);
-</p>
+</details>

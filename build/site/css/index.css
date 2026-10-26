@@ -240,6 +240,56 @@ b {
   align-items: start;
 }
 
+.post details {
+  margin: 1rem 0;
+  padding: 0 var(--padding);
+  background-color: var(--nav-bg-color);
+  box-shadow: var(--shadow);
+  border-left: 4px solid transparent;
+}
+
+.post details[open] {
+  padding-bottom: var(--padding);
+  border-left-color: var(--primary-color);
+}
+
+.post summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--padding) 0;
+  font-family: 'Roboto Slab', serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  list-style: none;
+}
+
+.post summary::-webkit-details-marker {
+  display: none;
+}
+
+.post summary::before {
+  content: "+";
+  min-width: 1ch;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.post details[open] summary {
+  margin-bottom: var(--padding);
+  border-bottom: 5px dotted var(--main-text-color);
+}
+
+.post details[open] summary::before {
+  content: "−";
+}
+
+.post details h3 {
+  margin-top: 1rem;
+}
+
 .post__back{
   display: flex;
   margin-bottom: 1rem;

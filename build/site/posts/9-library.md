@@ -28,6 +28,13 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *Shadow & Claw* — Gene Wolfe.
 - *Sword & Citadel* — Gene Wolfe.
 - *Starship Troopers* — Robert A. Heinlein.
+- *Neuromancer* — William Gibson.
+- *1984* — George Orwell.
+- *Animal Farm* — George Orwell.
+- *Burmese Days* — George Orwell.
+- *A Clergyman's Daughter* — George Orwell.
+- *Keep the Aspidistra Flying* — George Orwell.
+- *Coming Up for Air* — George Orwell.
 
 ## Non-fiction
 
@@ -61,3 +68,5 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *Capitalism, Socialism and Democracy* — Joseph Schumpeter.
 - *The Origin of Consciousness in the Breakdown of the Bicameral Mind* — Julian Jaynes.
 - *Industrial Society and Its Future* — Theodore Kaczynski.
+- *The Road to Wigan Pier* — George Orwell.
+- *The Red Queen: Sex and the Evolution of Human Nature* — Matt Ridley.

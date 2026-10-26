@@ -23,11 +23,11 @@ date: Feb 02, 2026
 
 ## Terminal / CLI
 
-**[micro](https://micro-editor.github.io/)** – My "normie" terminal text editor. It feels like a standard GUI app (standard `Ctrl` shortcuts, mouse support) but lives in the shell.
+**[micro](https://micro-editor.github.io/)** - My "normie" terminal text editor. It feels like a standard GUI app (standard `Ctrl` shortcuts, mouse support) but lives in the shell.
 
-**[k9s](https://k9scli.io/)** – Great TUI utility for k8s. Makes navigating clusters and checking logs significantly faster than manual `kubectl` commands.
+**[k9s](https://k9scli.io/)** - Great TUI utility for k8s. Makes navigating clusters and checking logs significantly faster than manual `kubectl` commands.
 
-**[opencode](https://opencode.ai/)** – Open-source AI coding agent that lives in the terminal. It has a polished TUI, supports multiple model providers, and keeps the whole coding workflow in the shell.
+**[opencode](https://opencode.ai/)** - Open-source AI coding agent TUI, supports multiple model providers.
 
 **[tilix](https://gnunn1.github.io/tilix-web/)** - Terminal emulator that follows the Gnome Human Interface Guidelines.
 
