@@ -50,10 +50,11 @@ The main goal is to **compare programming styles and frameworks** across languag
 **Tech Stack & Libraries:**
 
 - **TypeScript** — a typed superset of JavaScript with a mature tooling ecosystem.
-- **Effect** — a functional effects system for TypeScript, providing typed errors, composable concurrency, resource management, and dependency injection through services and layers.
+- **Effect** — a functional effects system for TypeScript, providing typed errors, composable concurrency, resource management, `Schema`, and dependency injection through services and layers.
 - **@effect/platform** — the HTTP server and router used to serve server‑rendered HTML and handle form submissions.
 - **@kitajs/html** — type‑safe JSX templates that render to HTML strings.
-- **@effect/sql-pg** — the PostgreSQL client for Effect SQL, used for users and sessions.
+- **@effect/sql** — typed SQL queries with `Model` and `SqlSchema`.
+- **@effect/sql-pg** — the PostgreSQL driver for Effect SQL, used for users and sessions.
 
-The example keeps the same feature set as the other implementations, with Effect services and layers separating the database, password hashing, and authentication logic.
+The example keeps the same feature set as the other implementations. It uses `Effect.Schema` to validate forms and brand usernames, passwords, and session tokens, and `@effect/sql`'s `Model` and `SqlSchema` for typed queries. The database, password hashing, and authentication logic are self-contained `Effect.Service` layers, and domain errors are mapped to HTTP responses with `Effect.catchTags`.
 

@@ -101,17 +101,24 @@ class="uri">https://github.com/de-angelov/effect-user-login</a></p>
 mature tooling ecosystem.</li>
 <li><strong>Effect</strong> — a functional effects system for
 TypeScript, providing typed errors, composable concurrency, resource
-management, and dependency injection through services and layers.</li>
+management, <code>Schema</code>, and dependency injection through
+services and layers.</li>
 <li><strong>@effect/platform</strong> — the HTTP server and router used
 to serve server‑rendered HTML and handle form submissions.</li>
 <li><strong>@kitajs/html</strong> — type‑safe JSX templates that render
 to HTML strings.</li>
-<li><strong>@effect/sql-pg</strong> — the PostgreSQL client for Effect
+<li><strong>@effect/sql</strong> — typed SQL queries with
+<code>Model</code> and <code>SqlSchema</code>.</li>
+<li><strong>@effect/sql-pg</strong> — the PostgreSQL driver for Effect
 SQL, used for users and sessions.</li>
 </ul>
-<p>The example keeps the same feature set as the other implementations,
-with Effect services and layers separating the database, password
-hashing, and authentication logic.</p>
+<p>The example keeps the same feature set as the other implementations.
+It uses <code>Effect.Schema</code> to validate forms and brand
+usernames, passwords, and session tokens, and <code>@effect/sql</code>'s
+<code>Model</code> and <code>SqlSchema</code> for typed queries. The
+database, password hashing, and authentication logic are self-contained
+<code>Effect.Service</code> layers, and domain errors are mapped to HTTP
+responses with <code>Effect.catchTags</code>.</p>
         <br>
         <br>
       </article>
