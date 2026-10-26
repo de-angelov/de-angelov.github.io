@@ -47,6 +47,8 @@ I decided to keep track of the books I have read. I will keep expanding this lis
 - *Domain Modeling Made Functional: Tackle Software Complexity with Domain-Driven Design and F#* — Scott Wlaschin.
 - *Database Internals* — Alex Petrov.
 - *Software Architecture: The Hard Parts* — Neal Ford, Mark Richards, Pramod Sadalage, and Zhamak Dehghani.
+- *Dependency Injection Principles, Practices, and Patterns* — Mark Seemann and Steven van Deursen.
+- *Functional Design and Architecture* — Alexander Gran.
 
 
 ### History 
