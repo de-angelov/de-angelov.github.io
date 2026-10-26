@@ -56,5 +56,5 @@ The main goal is to **compare programming styles and frameworks** across languag
 - **@effect/sql** — typed SQL queries with `Model` and `SqlSchema`.
 - **@effect/sql-pg** — the PostgreSQL driver for Effect SQL, used for users and sessions.
 
-The example keeps the same feature set as the other implementations. It uses `Effect.Schema` to validate forms and brand usernames, passwords, and session tokens, and `@effect/sql`'s `Model` and `SqlSchema` for typed queries. The database, password hashing, and authentication logic are self-contained `Effect.Service` layers, and domain errors are mapped to HTTP responses with `Effect.catchTags`.
+The example keeps the same feature set as the other implementations. It uses Effect's `Schema` module to validate forms and brand usernames, passwords, and session tokens, and `@effect/sql`'s `Model` and `SqlSchema` for typed queries. The database, password hashing, and authentication logic are self-contained `Effect.Service` layers, and domain errors are mapped to HTTP responses with `Effect.catchTags`.
 
