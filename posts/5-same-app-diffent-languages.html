@@ -30,7 +30,7 @@
       <div class="wrapper">
         <div class="masthead">
           <div class="post__tags">
-            Feb 27, 2026 &lt 2026 | FP | Haskell &gt
+            Feb 27, 2026 &lt 2026 | FP | Haskell | TypeScript &gt
           </div>
           <h1 class="fade-up-effect">
             Same App, Different Languages 
@@ -55,7 +55,7 @@ The app includes:</p>
 </ul>
 <hr />
 <h2 id="goal">Goal</h2>
-<p>The main goal is to <strong>compare Programming styles and
+<p>The main goal is to <strong>compare programming styles and
 frameworks</strong> across languages.</p>
 <hr />
 <h2 id="implemented">Implemented</h2>
@@ -63,32 +63,53 @@ frameworks</strong> across languages.</p>
 <p><strong>Repository:</strong> <a
 href="https://github.com/de-angelov/scala-user-login"
 class="uri">https://github.com/de-angelov/scala-user-login</a></p>
-<p><strong>Tech Stack &amp; Libraries:</strong> - <strong>Scala
-3</strong> — modern, strongly typed JVM language with functional
-programming features. - <strong>ZIO</strong> — a purely functional
-effect system &amp; runtime for Scala, offering type‑safe, composable
-concurrency and resource management (handles effects, asynchronous
-programming, error handling, and more).</p>
+<p><strong>Tech Stack &amp; Libraries:</strong></p>
+<ul>
+<li><strong>Scala 3</strong> — modern, strongly typed JVM language with
+functional programming features.</li>
+<li><strong>ZIO</strong> — a purely functional effect system &amp;
+runtime for Scala, offering type‑safe, composable concurrency and
+resource management (handles effects, asynchronous programming, error
+handling, and more).</li>
+</ul>
 <hr />
 <h3 id="haskell--servant--rio">Haskell + Servant + RIO</h3>
 <p><strong>Repository:</strong> <a
 href="https://github.com/de-angelov/servant-user-login"
 class="uri">https://github.com/de-angelov/servant-user-login</a></p>
-<p><strong>Tech Stack &amp; Libraries:</strong> -
-<strong>Haskell</strong> — a purely functional programming language with
-a strong static type system. - <strong>Servant</strong> — a Haskell web
-framework / type‑level DSL for describing APIs. Routes are defined as
-types which are then interpreted by the framework to provide servers,
-client stubs, documentation, etc. - <strong>RIO</strong> — a
-batteries‑included, opinionated Haskell standard library and Prelude
-replacement, providing common tools (logging, environment management,
-safe defaults) to make production Haskell code more ergonomic.</p>
-<hr />
-<h2 id="planned">Planned</h2>
+<p><strong>Tech Stack &amp; Libraries:</strong></p>
 <ul>
-<li><strong>TypeScript + Effect‑TS</strong> — using a functional effects
-system in the TypeScript ecosystem.</li>
+<li><strong>Haskell</strong> — a purely functional programming language
+with a strong static type system.</li>
+<li><strong>Servant</strong> — a Haskell web framework / type‑level DSL
+for describing APIs. Routes are defined as types which are then
+interpreted by the framework to provide servers, client stubs,
+documentation, etc.</li>
+<li><strong>RIO</strong> — a batteries‑included, opinionated Haskell
+standard library and Prelude replacement, providing common tools
+(logging, environment management, safe defaults) to make production
+Haskell code more ergonomic.</li>
 </ul>
+<hr />
+<h3 id="typescript--effect">TypeScript + Effect</h3>
+<p><strong>Repository:</strong> <a
+href="https://github.com/de-angelov/effect-user-login"
+class="uri">https://github.com/de-angelov/effect-user-login</a></p>
+<p><strong>Tech Stack &amp; Libraries:</strong></p>
+<ul>
+<li><strong>TypeScript</strong> — a typed superset of JavaScript with a
+mature tooling ecosystem.</li>
+<li><strong>Effect</strong> — a functional effects system for
+TypeScript, providing typed errors, composable concurrency, resource
+management, and dependency injection through services and layers.</li>
+<li><strong>@effect/platform</strong> — the HTTP server and router used
+to serve server‑rendered HTML and handle form submissions.</li>
+<li><strong>@effect/sql-pg</strong> — the PostgreSQL client for Effect
+SQL, used for users and sessions.</li>
+</ul>
+<p>The example keeps the same feature set as the other implementations,
+with Effect services and layers separating the database, password
+hashing, and authentication logic.</p>
         <br>
         <br>
       </article>
