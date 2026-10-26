@@ -6,10 +6,10 @@
       <meta name="description" content="Personal blog">
       <meta name="author" content="Denis Angelov">
       <meta name=viewport content="width=device-width, initial-scale=1">
-      <title>SSH Utilities Cheat Sheet</title>
+      <title>Cheat Sheet</title>
       <link rel="stylesheet" href="/css/reset.css">
       <link rel="stylesheet" href="/css/prism.css">
-      <link rel="stylesheet" href="/css/index.06c7c9c2-f794-5909-b431-c582c60d2b04.css">
+      <link rel="stylesheet" href="/css/index.92a3af9c-98dd-5080-9854-18ce1c678515.css">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
   </head>  <body>
@@ -33,22 +33,34 @@
             Mar 2, 2026 &lt 2026 | Linux &gt
           </div>
           <h1 class="fade-up-effect">
-            SSH Utilities Cheat Sheet 
+            Cheat Sheet 
           </h1>
     
         </div>
       </div>
       <article class="post">
-        <p>Secure Shell (SSH) is most commonly implemented via OpenSSH, the
-standard open-source SSH suite on Linux and macOS systems.</p>
-<p>This post is a practical cheat sheet of core SSH commands <strong>and
-related utilities like <code>ssh-copy-id</code></strong>, focused on
-daily sysadmin and developer workflows.</p>
-<hr />
-<h2 id="closed_lock_with_key-core-ssh-commands">🔐 Core SSH
-Commands</h2>
-<h3 id="ssh--remote-login"><code>ssh</code> — Remote Login</h3>
+        <p>A growing collection of commands and snippets I use regularly. Expand
+a topic below to see the details.</p>
+<details>
+<summary>SSH</summary>
+
+<p>Secure Shell (SSH) is most commonly implemented via OpenSSH, the standard open-source SSH suite on Linux and macOS systems.</p>
+
+<h3>How SSH Works</h3>
+
+<p class="mermaid">
+graph TD;
+    A[Local Machine] -->|Private Key| B(SSH Client);
+    B -->|Encrypted Channel| C[Remote SSH Server];
+    C -->|authorized_keys| D(User Account);
+</p>
+
+<h3>Core Commands</h3>
+
+<h4><code>ssh</code> — Remote Login</h4>
+
 <p>Connect to a remote machine:</p>
+
 <pre>
 <code class="language-bash">
 ssh user@host
@@ -56,7 +68,9 @@ ssh -p 2222 user@host
 ssh -i ~/.ssh/id_ed25519 user@host
 </code>
 </pre>
+
 <p>Port forwarding examples:</p>
+
 <pre>
 <code class="language-bash">
 # Local forwarding
@@ -69,25 +83,32 @@ ssh -R 9090:localhost:3000 user@host
 ssh -D 1080 user@host
 </code>
 </pre>
-<h3 id="ssh-keygen--key-management"><code>ssh-keygen</code> — Key
-Management</h3>
-<p>Generate modern key:</p>
+
+<h3>Keys &amp; Agent</h3>
+
+<h4><code>ssh-keygen</code> — Key Management</h4>
+
+<p>Generate a modern key:</p>
+
 <pre>
 <code class="language-bash">
 ssh-keygen -t ed25519 -C "you@example.com"
 </code>
 </pre>
+
 <p>Other useful operations:</p>
+
 <pre>
 <code class="language-bash">
 ssh-keygen -l -f id_ed25519.pub   # fingerprint
 ssh-keygen -R hostname            # remove host from known_hosts
 </code>
 </pre>
-<h3 id="ssh-copy-id--install-public-key"><code>ssh-copy-id</code> —
-Install Public Key</h3>
-<p>Copies your public key to a remote host’s
-<code>authorized_keys</code>.</p>
+
+<h4><code>ssh-copy-id</code> — Install Public Key</h4>
+
+<p>Copies your public key to a remote host’s <code>authorized_keys</code>.</p>
+
 <pre>
 <code class="language-bash">
 ssh-copy-id user@host
@@ -95,10 +116,59 @@ ssh-copy-id -i ~/.ssh/work.pub user@host
 ssh-copy-id -p 2222 user@host
 </code>
 </pre>
+
 <p>👉 Only copies <strong>public keys</strong>, never private keys.</p>
-<h2 id="open_file_folder-file-transfer-utilities">📂 File Transfer
-Utilities</h2>
-<h3 id="scp--secure-copy"><code>scp</code> — Secure Copy</h3>
+
+<h4><code>ssh-agent</code> — Background Key Manager</h4>
+
+<pre>
+<code class="language-bash">
+eval "$(ssh-agent -s)"
+</code>
+</pre>
+
+<h4><code>ssh-add</code> — Load Keys Into Agent</h4>
+
+<pre>
+<code class="language-bash">
+ssh-add ~/.ssh/id_ed25519
+ssh-add -l
+ssh-add -D
+</code>
+</pre>
+
+<p>Prevents repeated passphrase prompts.</p>
+
+<h4>Important SSH Files</h4>
+
+<p>Local (<code>~/.ssh/</code>):</p>
+
+<ul>
+<li><code>id_ed25519</code> → private key</li>
+<li><code>id_ed25519.pub</code> → public key</li>
+<li><code>known_hosts</code> → trusted hosts</li>
+<li><code>config</code> → client shortcuts</li>
+</ul>
+
+<p>Remote:</p>
+
+<ul>
+<li><code>~/.ssh/authorized_keys</code> → allowed public keys</li>
+</ul>
+
+<p>Correct permissions matter:</p>
+
+<pre>
+<code class="language-bash">
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+</code>
+</pre>
+
+<h3>File Transfer</h3>
+
+<h4><code>scp</code> — Secure Copy</h4>
+
 <pre>
 <code class="language-bash">
 scp file.txt user@host:/remote/path
@@ -106,14 +176,17 @@ scp -r folder user@host:/remote/path
 scp user@host:/remote/file.txt .
 </code>
 </pre>
-<h3 id="sftp--interactive-file-transfer"><code>sftp</code> — Interactive
-File Transfer</h3>
+
+<h4><code>sftp</code> — Interactive File Transfer</h4>
+
 <pre>
 <code class="language-bash">
 sftp user@host
 </code>
 </pre>
-<p>Inside session:</p>
+
+<p>Inside a session:</p>
+
 <pre>
 <code class="language-bash">
 put file.txt
@@ -122,80 +195,59 @@ ls
 cd
 </code>
 </pre>
-<h3 id="rsync-over-ssh--efficient-sync"><code>rsync</code> over SSH —
-Efficient Sync</h3>
+
+<h4><code>rsync</code> over SSH — Efficient Sync</h4>
+
 <pre>
 <code class="language-bash">
 rsync -avz -e ssh folder/ user@host:/remote/folder
 </code>
 </pre>
+
 <p>Efficient for backups and deployments.</p>
-<h2 id="key-ssh-agent-utilities">🔑 SSH Agent Utilities</h2>
-<h3 id="ssh-agent--background-key-manager"><code>ssh-agent</code> —
-Background Key Manager</h3>
-<pre>
-<code class="language-bash">
-eval "$(ssh-agent -s)"
-</code>
-</pre>
-<h3 id="ssh-add--load-keys-into-agent"><code>ssh-add</code> — Load Keys
-Into Agent</h3>
-<pre>
-<code class="language-bash">
-ssh-add ~/.ssh/id_ed25519
-ssh-add -l
-ssh-add -D
-</code>
-</pre>
-<p>Prevents repeated passphrase prompts.</p>
-<h2 id="gear-server-side-utilities">⚙️ Server-Side Utilities</h2>
-<h3 id="sshd--ssh-daemon"><code>sshd</code> — SSH Daemon</h3>
+
+<h3>Server</h3>
+
+<h4><code>sshd</code> — SSH Daemon</h4>
+
 <p>Check status:</p>
+
 <pre>
 <code class="language-bash">
 systemctl status sshd
 </code>
 </pre>
+
 <p>Restart:</p>
+
 <pre>
 <code class="language-bash">
 sudo systemctl restart sshd
 </code>
 </pre>
+
 <p>Main config file:</p>
+
 <pre>
 <code class="language-bash">
 /etc/ssh/sshd_config
 </code>
 </pre>
-<h2 id="-important-ssh-files">🗂 Important SSH Files</h2>
-<p>Local (<code>~/.ssh/</code>):</p>
-<ul>
-<li><code>id_ed25519</code> → private key</li>
-<li><code>id_ed25519.pub</code> → public key</li>
-<li><code>known_hosts</code> → trusted hosts</li>
-<li><code>config</code> → client shortcuts</li>
-</ul>
-<p>Remote:</p>
-<ul>
-<li><code>~/.ssh/authorized_keys</code> → allowed public keys</li>
-</ul>
-<p>Correct permissions matter:</p>
-<pre>
-<code class="language-bash">
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/authorized_keys
-</code>
-</pre>
-<h2 id="brain-useful-power-tricks">🧠 Useful Power Tricks</h2>
-<h3 id="jump-host-bastion">Jump Host (Bastion)</h3>
+
+<h3>Power Tricks</h3>
+
+<h4>Jump Host (Bastion)</h4>
+
 <pre>
 <code class="language-bash">
 ssh -J user@jump user@internal-host
 </code>
 </pre>
-<h3 id="ssh-config-aliases">SSH Config Aliases</h3>
+
+<h4>SSH Config Aliases</h4>
+
 <p><code>~/.ssh/config</code>:</p>
+
 <pre>
 <code class="language-bash">
 Host prod
@@ -205,30 +257,27 @@ Host prod
     IdentityFile ~/.ssh/prod_key
 </code>
 </pre>
+
 <p>Then simply:</p>
+
 <pre>
 <code class="language-bash">
 ssh prod
 </code>
 </pre>
-<h2 id="closed_lock_with_key-minimal-secure-setup-checklist">🔐 Minimal
-Secure Setup Checklist</h2>
+
+<h3>Security Checklist</h3>
+
 <ul>
 <li>Use <code>ed25519</code> keys</li>
 <li>Disable password authentication</li>
 <li>Disable root login</li>
-<li>Use non-standard port (optional)</li>
+<li>Use a non-standard port (optional)</li>
 <li>Use fail2ban (optional)</li>
 <li>Restrict users via <code>AllowUsers</code></li>
 </ul>
-<hr />
-<h2 id="jigsaw-mental-model">🧩 Mental Model</h2>
-<p class="mermaid">
-graph TD;
-    A[Local Machine] -->|Private Key| B(SSH Client);
-    B -->|Encrypted Channel| C[Remote SSH Server];
-    C -->|authorized_keys| D(User Account);
-</p>
+
+</details>
         <br>
         <br>
       </article>
@@ -237,7 +286,7 @@ graph TD;
       © 2026  Denis Angelov. All rights reserved.
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-    <script src="/js/index.06c7c9c2-f794-5909-b431-c582c60d2b04.js"></script>
+    <script src="/js/index.92a3af9c-98dd-5080-9854-18ce1c678515.js"></script>
     <script src="/js/prism.js"></script>  </div>
   </body>
 </html>
