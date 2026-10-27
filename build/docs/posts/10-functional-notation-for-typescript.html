@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head profile="http://www.w3.org/2005/10/profile">
+      <meta charset="UTF-8">
+      <meta name="description" content="Personal blog">
+      <meta name="author" content="Denis Angelov">
+      <meta name=viewport content="width=device-width, initial-scale=1">
+      <title>Designing a Functional Notation for TypeScript</title>
+      <link rel="stylesheet" href="/css/reset.css">
+      <link rel="stylesheet" href="/css/prism.css">
+      <link rel="stylesheet" href="/css/index.92a3af9c-98dd-5080-9854-18ce1c678515.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  </head>  <body>
+  <div class="main-container">
+    <header>
+      <div class="header__icon"></div>
+      <nav class="header__nav shine-effect">
+        <a id="home" href="/index.html">home</a>
+        <a id="blog" href="/blog.html">blog</a>
+        <!-- <a id="cv" href="/cv.html">cv</a> -->
+      </nav>
+    </header>    <div class="post__back">
+
+      <a href="/blog.html" class="post__back-button"> < Back </a>
+    
+    </div>
+    <main>
+      <div class="wrapper">
+        <div class="masthead">
+          <div class="post__tags">
+            Oct 27, 2026 &lt 2026 | FP | TypeScript &gt
+          </div>
+          <h1 class="fade-up-effect">
+            Designing a Functional Notation for TypeScript 
+          </h1>
+    
+        </div>
+      </div>
+      <article class="post">
+        <p>I really enjoy building applications with <strong>Effect</strong>,
+<strong>ts-pattern</strong>, and <strong>Mutative</strong> in TypeScript
+(as in my <a href="/posts/5-same-app-diffent-languages.html">Same App,
+Different Languages</a> experiment). Together they give TypeScript a
+real functional effect system, typed errors, dependency injection via
+<code>Context</code> and <code>Layer</code>, runtime-validated schemas
+(<code>Schema</code>), structural equality (<code>Data</code>),
+exhaustive pattern matching, and fast immutable updates.</p>
+<p>The problem isn't what those libraries do — it's <strong>how much
+syntax ceremony it takes to say it</strong>.</p>
+<p>What if we kept the exact same TypeScript type checker
+(<code>tsc</code>), the exact same npm ecosystem, and
+<strong>Effect</strong> as the standard library, but stripped away
+thirty years of JavaScript syntax baggage?</p>
+<p><strong>FunScript</strong> is a language idea and specification I've
+been designing: a small, <strong>16-keyword</strong>, indentation-based
+functional notation that compiles 1-to-1 to readable TypeScript for the
+Effect + ts-pattern + Mutative stack.</p>
+<hr />
+<h2 id="the-itch-intent-vs-ceremony">The Itch: Intent vs. Ceremony</h2>
+<p>A small, idiomatic Effect program in TypeScript looks like this:</p>
+<pre>
+<code class="language-js">
+import { Context, Data, Effect, Layer, Schema } from "effect";
+import { match } from "ts-pattern";
+
+export const User = Schema.Struct({
+  id: Schema.UUID,
+  name: Schema.NonEmptyString,
+});
+export type User = typeof User.Type;
+
+export class NotFound extends Data.TaggedError("NotFound")&lt;{
+  readonly id: string;
+}&gt; {}
+
+export class UserRepo extends Context.Service&lt;UserRepo, {
+  readonly find: (id: string) =&gt; Effect.Effect&lt;User, NotFound&gt;;
+}&gt;()("UserRepo") {}
+
+export const UserRepoLive = Layer.succeed(UserRepo, {
+  find: (id) =&gt;
+    id === "1"
+      ? Effect.succeed({ id: "1" as Schema.UUID, name: "Ada" as Schema.NonEmptyString })
+      : Effect.fail(new NotFound({ id })),
+});
+
+export const main = Effect.gen(function* () {
+  const repo = yield* UserRepo;
+  const user = yield* repo.find("1");
+  return user.name;
+}).pipe(Effect.provide(UserRepoLive));
+</code>
+</pre>
+<p>And here is the exact same program in <strong>FunScript</strong>:</p>
+<pre>
+<code class="language-js">
+import { Effect, Layer } from "effect"
+
+export type User = {
+  id: UUID
+  name: NonEmptyString
+}
+
+export error NotFound(id: string)
+
+export service UserRepo "UserRepo"
+  find: (id: string) =&gt; Effect&lt;User, NotFound&gt;
+
+export UserRepoLive = Layer.succeed(UserRepo, {
+  find: (id) -&gt;
+    match
+      | id == "1" -&gt; Effect.succeed({ id: "1" as UUID, name: "Ada" as NonEmptyString })
+      | _ -&gt; Effect.fail(NotFound(id))
+})
+
+export main =
+  effect
+    repo &lt;- UserRepo
+    user &lt;- repo.find("1")
+    user.name
+  |&gt; Effect.provide(UserRepoLive)
+</code>
+</pre>
+<p>The goal is not to invent a new virtual machine, a custom type
+checker, or a parallel standard library:</p>
+<ul>
+<li><strong>Effect TS is the standard library.</strong></li>
+<li><strong><code>tsc</code> is the type checker.</strong></li>
+<li><strong>Zero custom runtime.</strong> The compiler emits clean,
+formatted <code>.ts</code> files that import <code>effect</code>,
+<code>ts-pattern</code>, and <code>mutative</code> directly. If you ever
+stop using it, you run <code>funscript emit</code>, keep the generated
+TypeScript, and walk away.</li>
+</ul>
+<hr />
+<h2 id="core-design-philosophy-one-way-per-job">Core Design Philosophy:
+One Way Per Job</h2>
+<p>JavaScript and TypeScript have accumulated decades of competing ways
+to express the same idea
+(<code>let</code>/<code>const</code>/<code>var</code>,
+<code>function</code>/arrows/methods,
+<code>if</code>/ternary/<code>switch</code>,
+<code>for</code>/<code>while</code>/<code>forEach</code>,
+<code>null</code>/<code>undefined</code>,
+<code>interface</code>/<code>type</code>/<code>class</code>/<code>enum</code>,
+<code>try</code>/<code>catch</code> vs. <code>Promise</code> vs.
+<code>Effect</code>).</p>
+<p>This design takes the opposite stance — <strong>one way per
+job</strong>:</p>
+<ul>
+<li><strong>16 keywords total:</strong> <code>and</code>,
+<code>as</code>, <code>effect</code>, <code>error</code>,
+<code>export</code>, <code>false</code>, <code>from</code>,
+<code>import</code>, <code>match</code>, <code>mut</code>,
+<code>not</code>, <code>or</code>, <code>service</code>,
+<code>true</code>, <code>type</code>, <code>when</code>.</li>
+<li><strong>No <code>if</code>, <code>then</code>, <code>else</code>,
+<code>switch</code>, or <code>? :</code></strong> — <code>match</code>
+handles both structural pattern matching and boolean branching.</li>
+<li><strong>No <code>return</code></strong> — every function,
+<code>match</code> arm, and <code>effect</code> block is an expression
+that evaluates to its final line.</li>
+<li><strong>No <code>null</code>, <code>undefined</code>, or
+<code>any</code></strong> — absence is <code>Option&lt;A&gt;</code>, and
+external boundaries use <code>unknown</code> +
+<code>Schema.decodeUnknown</code>.</li>
+<li><strong>No <code>class</code>, <code>new</code>, <code>this</code>,
+<code>interface</code>, <code>enum</code>, or <code>data</code></strong>
+— one <code>type</code> keyword handles schemas, tagged unions, and type
+aliases.</li>
+<li><strong>No <code>for</code> or <code>while</code> loops</strong> —
+pure iteration uses Effect <code>Array</code>/<code>Record</code>
+pipelines; effectful iteration uses <code>Effect.forEach</code>.</li>
+<li><strong>No <code>async</code>/<code>await</code> or
+<code>try</code>/<code>catch</code>/<code>throw</code></strong> —
+<code>effect</code> blocks (<code>&lt;-</code>) and typed
+<code>error</code> declarations are the only concurrency and error
+model.</li>
+</ul>
+<hr />
+<h2 id="language-tour--syntax-specs">Language Tour &amp; Syntax
+Specs</h2>
+<h3
+id="1-unified-type-runtime-schema--tagged-unions--typescript-types">1.
+Unified <code>type</code>: Runtime <code>Schema</code> + Tagged Unions +
+TypeScript Types</h3>
+<p>In TypeScript, static types and runtime validators often drift apart,
+or require declaring both a <code>Schema</code> value and
+<code>export type X = typeof X.Type</code>. Here, a single
+<code>type</code> keyword handles all three jobs:</p>
+<ol>
+<li><strong>Data records and scalars</strong> compile to
+<strong>both</strong> an Effect <code>Schema</code> runtime validator
+and a static TypeScript <code>type</code>.</li>
+<li><strong>Tagged unions (<code>| Variant(...)</code>)</strong> compile
+to Effect's <code>Data.TaggedEnum</code>, positional constructors, and a
+companion <code>Schema.Union</code>.</li>
+<li><strong>Function/Effect signatures</strong> compile to zero-cost
+TypeScript <code>type</code> aliases.</li>
+</ol>
+<pre>
+<code class="language-js">
+# 1. Branded &amp; refined scalar Schema + static type
+export type Username =
+  string
+  |&gt; Schema.trimmed
+  |&gt; Schema.minLength(3)
+  |&gt; Schema.brand("Username")
+
+# 2. Struct Schema with optional (?) and default (=) fields
+export type User = {
+  id: UUID
+  name: Username
+  age: Int |&gt; Schema.between(0, 150)
+  role: "admin" | "member" = "member"
+  bio?: NonEmptyString
+}
+
+# 3. Tagged union (Data.TaggedEnum + constructors + Schema.Union)
+export type Shape =
+  | Circle(radius: number)
+  | Rect(width: number, height: number)
+
+# 4. Compile-time TypeScript alias (no runtime output)
+export type Lookup = (id: UUID) =&gt; Effect&lt;User, NotFound&gt;
+</code>
+</pre>
+<p>Because <code>User</code> and <code>Shape</code> exist at both the
+type level and value level, you can annotate parameters with
+<code>: User</code> and decode untrusted JSON with
+<code>Schema.decodeUnknown(User)(raw)</code> from a single
+declaration.</p>
+<hr />
+<h3 id="2-only-match-exhaustive-pattern-matching--boolean-branching">2.
+Only <code>match</code>: Exhaustive Pattern Matching &amp; Boolean
+Branching</h3>
+<p>There is no <code>if</code>/<code>else</code>, <code>switch</code>,
+or ternary <code>? :</code>. Instead, <code>match</code> has two
+forms:</p>
+<h4
+id="structural-value-matching-compiles-to-ts-pattern-exhaustive">Structural
+value matching (compiles to <code>ts-pattern</code>
+<code>.exhaustive()</code>)</h4>
+<pre>
+<code class="language-js">
+export describe = (shape: Shape) -&gt;
+  match shape
+    | Circle(0) -&gt; "point"
+    | Circle(r) when r &gt; 100 -&gt; "huge circle ({r})"
+    | Circle(r) -&gt; "circle ({r})"
+    | Rect(w, h) -&gt; "{w} by {h}"
+
+# Or-patterns (`| A | B -&gt;`) and pipeline `|&gt; match`
+export findName = (users: Array&lt;User&gt;, id: string) -&gt;
+  users
+  |&gt; Array.findFirst((u) -&gt; u.id == id)
+  |&gt; match
+    | Some({ name }) -&gt; name
+    | None -&gt; "anonymous"
+</code>
+</pre>
+<h4
+id="subjectless-match-for-boolean-conditions-compiles-to-native-js---or-if--else">Subjectless
+<code>match</code> for boolean conditions (compiles to native JS
+<code>? :</code> or <code>if / else</code>)</h4>
+<p>When <code>match</code> has no scrutinee expression, each arm is a
+boolean condition that compiles directly to native JavaScript
+<code>? :</code> or <code>if / else if / else</code> with zero
+<code>ts-pattern</code> runtime overhead:</p>
+<pre>
+<code class="language-js">
+# Inline two-branch expression
+sign = match | n &gt; 0 -&gt; "positive" | _ -&gt; "non-positive"
+
+# Multi-branch block
+tier =
+  match
+    | score &gt;= 90 and verified -&gt; "platinum"
+    | score &gt;= 75 -&gt; "gold"
+    | score &gt;= 50 -&gt; "silver"
+    | _ -&gt; "bronze"
+</code>
+</pre>
+<p>When used as a value expression, a trailing <code>| _ -&gt;</code>
+fallback is required so a conditional can never silently evaluate to
+<code>undefined</code>.</p>
+<hr />
+<h3 id="3-pipelines--with-_-argument-placeholders">3. Pipelines
+(<code>|&gt;</code>) with <code>_</code> Argument Placeholders</h3>
+<p>Data flows left-to-right using F#-style pipelines that compile to
+Effect's <code>pipe</code>:</p>
+<ul>
+<li><code>x |&gt; f</code> calls <code>f(x)</code></li>
+<li><code>x |&gt; f(a)</code> calls curried data-last
+<code>f(a)(x)</code> (Effect's standard convention)</li>
+<li><code>x |&gt; f(a, _)</code> plugs <code>x</code> into the
+<code>_</code> slot of an ordinary uncurried function
+<code>f(a, x)</code></li>
+</ul>
+<pre>
+<code class="language-js">
+score =
+  rawInput
+  |&gt; parseScore
+  |&gt; clamp(0, 100, _)
+  |&gt; formatScore(_, "en-US")
+</code>
+</pre>
+<p>Point-free composition (<code>&gt;&gt;</code>) is intentionally
+omitted because <code>flow(f, g)</code> degrades TypeScript's generic
+type inference; writing <code>(x) -&gt; x |&gt; f |&gt; g</code> is
+nearly as short and preserves full contextual inference.</p>
+<hr />
+<h3 id="4-immutable-copy-on-write-updates--spread--and-mut-mutative">4.
+Immutable Copy-on-Write Updates: <code>{ ...spread }</code> and
+<code>mut</code> (Mutative)</h3>
+<p>All bindings (<code>x = 1</code>), records, and arrays are deeply
+<code>readonly</code> by default. To update data ergonomically without
+mutating shared references, declarative spreads are paired with
+imperative <code>mut</code> drafts powered by <strong>Mutative</strong>
+(<code>create</code>):</p>
+<h4 id="declarative-updates-with--base---90-of-updates">Declarative
+updates with <code>{ ...base, ... }</code> (90% of updates)</h4>
+<p>Shallow overrides emit a plain JS spread
+(<code>{ ...todo, completed: true }</code>). When you use a nested
+dot-path (<code>address.city: "Paris"</code>), the compiler
+automatically lowers it to Mutative's <code>create</code>:</p>
+<pre>
+<code class="language-js">
+# Shallow -&gt; `{ ...todo, completed: true }`
+done = { ...todo, completed: true }
+
+# Deep dot-paths -&gt; `create(user, draft =&gt; { ... })`
+moved = {
+  ...user
+  age: user.age + 1
+  address.city: "Paris"
+  address.zip: "75001"
+}
+</code>
+</pre>
+<h4 id="imperative-copy-on-write-with-mut---10-of-updates">Imperative
+copy-on-write with <code>mut</code> + <code>=</code> (10% of
+updates)</h4>
+<p>When you need step-by-step updates, array methods
+(<code>.push</code>, <code>.splice</code>, <code>.sort</code>), or
+conditional mutations, declare a local <code>mut</code> binding or pipe
+into <code>|&gt; mut (draft) -&gt;</code>:</p>
+<pre>
+<code class="language-js">
+recordLogin = (user: User) -&gt;
+  mut draft = user
+  draft.visits = draft.visits + 1
+  draft.tags.push("active")
+  match
+    | draft.visits &gt; 10 -&gt; draft.tier = "gold"
+  draft
+
+# Or inline in a pipeline:
+updated =
+  user
+  |&gt; mut (d) -&gt; d.tags.push("onboarded")
+</code>
+</pre>
+<p>Reassigning with <code>=</code> is only valid on a <code>mut</code>
+binding (never on an immutable binding), and <code>mut</code> cannot
+cross closure boundaries — shared or concurrent state across fibers
+always uses <code>Effect.Ref</code>.</p>
+<hr />
+<h3 id="5-effect-blocks-error-and-service">5. <code>effect</code>
+Blocks, <code>error</code>, and <code>service</code></h3>
+<p><code>effect</code> blocks compile to
+<code>Effect.gen(function* () { ... })</code>, where <code>&lt;-</code>
+is <code>yield*</code> and <code>_ &lt;-</code> runs an effect for its
+side effects:</p>
+<pre>
+<code class="language-js">
+import { Effect, Schedule } from "effect"
+import { FetchHttpClient, HttpClient, HttpClientResponse } from "effect/http"
+
+export type Todo = {
+  id: Int
+  title: NonEmptyString
+  completed: boolean
+}
+
+export fetchTodo = (id: number) -&gt;
+  effect
+    response &lt;- HttpClient.get("https://jsonplaceholder.typicode.com/todos/{id}")
+    todo &lt;- response |&gt; HttpClientResponse.schemaBodyJson(Todo)
+    { ...todo, completed: true }
+  |&gt; Effect.retry(Schedule.exponential("100 millis"))
+  |&gt; Effect.provide(FetchHttpClient.layer)
+</code>
+</pre>
+<p>A key guardrail in <code>effect</code> blocks: <strong>a non-final
+bare expression is a syntax error</strong>. In raw
+<code>Effect.gen</code>, writing <code>Console.log("hi")</code> without
+<code>yield*</code> silently creates an unused <code>Effect</code> and
+never runs it. In FunScript, every non-final line must bind
+(<code>=</code> or <code>&lt;-</code>) or discard
+(<code>_ &lt;- Console.log("hi")</code>).</p>
+<hr />
+<h3 id="6-type-driven-development-with-typed-holes-">6. Type-Driven
+Development with Typed Holes (<code>???</code>)</h3>
+<p>While sketching an implementation, you can drop <code>???</code> (or
+<code>??? "label"</code>) into any expression position:</p>
+<pre>
+<code class="language-js">
+export checkout = (user: User, cart: Cart): Effect&lt;Receipt, PaymentError&gt; -&gt;
+  effect
+    total = calculateTotal(cart)
+    ??? "charge payment provider"
+</code>
+</pre>
+<p>The compiler lowers <code>???</code> to a <code>never</code>-typed
+throw and queries TypeScript's
+<code>checker.getContextualType(node)</code> and
+<code>checker.getSymbolsInScope(node)</code> to print the exact expected
+type and local bindings in scope:</p>
+<pre>
+<code class="language-bash">
+warning[funscript/typed-hole]: Unfinished hole `???` ("charge payment provider")
+  --&gt; src/checkout.fun:4:5
+  | Expected type: Effect&lt;Receipt, PaymentError, never&gt;
+  | In scope:
+  |   user  : User
+  |   cart  : Cart
+  |   total : number
+</code>
+</pre>
+<p>Typed holes emit warnings during <code>funscript dev</code> and
+<code>funscript test</code> (so you can run other branches while
+iterating) and are a hard error in <code>funscript build</code>.</p>
+<hr />
+<h2 id="summary-cheat-sheet">Summary Cheat Sheet</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Construct</th>
+<th>Syntax</th>
+<th>Compiles to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immutable binding</td>
+<td><code>x = 1</code></td>
+<td><code>const x = 1;</code></td>
+</tr>
+<tr>
+<td>Local mutable / draft</td>
+<td><code>mut x = user</code> / <code>x.a = 1</code></td>
+<td><code>let</code> / Mutative <code>create(user, ...)</code></td>
+</tr>
+<tr>
+<td>Shallow / deep copy</td>
+<td><code>{ ...u, a.b: 1 }</code></td>
+<td><code>{ ...u, ... }</code> / Mutative <code>create(...)</code></td>
+</tr>
+<tr>
+<td>Function</td>
+<td><code>(a: number, b: number) -&amp;gt; a + b</code></td>
+<td><code>(a: number, b: number) =&amp;gt; a + b</code></td>
+</tr>
+<tr>
+<td>Pipeline &amp; placeholder</td>
+<td><code>x \|&amp;gt; f(a) \|&amp;gt; g(1, _)</code></td>
+<td><code>pipe(x, f(a), (__p) =&amp;gt; g(1, __p))</code></td>
+</tr>
+<tr>
+<td>Pattern match</td>
+<td><code>match x \| A(v) -&amp;gt; v</code></td>
+<td><code>match(x).with({ _tag: "A" }, ...).exhaustive()</code></td>
+</tr>
+<tr>
+<td>Boolean match</td>
+<td><code>match \| x &amp;gt; 0 -&amp;gt; "pos" \| _ -&amp;gt; "neg"</code></td>
+<td><code>x &amp;gt; 0 ? "pos" : "neg"</code></td>
+</tr>
+<tr>
+<td>Schema &amp; type</td>
+<td><code>type User = { id: UUID }</code></td>
+<td><code>Schema.Struct(...)</code> + <code>typeof User.Type</code></td>
+</tr>
+<tr>
+<td>Tagged union</td>
+<td><code>type Shape = \| Circle(r: number)</code></td>
+<td><code>Data.TaggedEnum</code> + <code>Schema.Union</code></td>
+</tr>
+<tr>
+<td>Typed error</td>
+<td><code>error NotFound(id: string)</code></td>
+<td><code>class NotFound extends Data.TaggedError...</code></td>
+</tr>
+<tr>
+<td>Service</td>
+<td><code>service Repo ...</code></td>
+<td><code>class Repo extends Context.Service...</code></td>
+</tr>
+<tr>
+<td>Effect block</td>
+<td><code>effect</code> + <code>x &amp;lt;- eff</code></td>
+<td><code>Effect.gen(function* () { const x = yield* eff; })</code></td>
+</tr>
+<tr>
+<td>Typed hole</td>
+<td><code>??? "todo"</code></td>
+<td><code>never</code> throw + contextual type diagnostic</td>
+</tr>
+</tbody>
+</table>
+        <br>
+        <br>
+      </article>
+    </main>
+    <footer>
+      © 2026  Denis Angelov. All rights reserved.
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="/js/index.92a3af9c-98dd-5080-9854-18ce1c678515.js"></script>
+    <script src="/js/prism.js"></script>  </div>
+  </body>
+</html>
