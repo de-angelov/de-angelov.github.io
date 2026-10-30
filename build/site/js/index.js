@@ -15,12 +15,37 @@
 			.filter(x => x !== "");
 	}
 
+	var themes = ['light', 'dark', 'warm'];
+
+	function applyTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		try { localStorage.setItem('theme', theme); } catch (e) {}
+	}
+
+	function initTheme() {
+		var saved = null;
+		try { saved = localStorage.getItem('theme'); } catch (e) {}
+		var theme = themes.indexOf(saved) >= 0 ? saved : 'light';
+		applyTheme(theme);
+	}
+
+	function cycleTheme() {
+		var current = document.documentElement.getAttribute('data-theme') || 'light';
+		var idx = themes.indexOf(current);
+		var next = themes[(idx + 1) % themes.length];
+		applyTheme(next);
+	}
+
 	function initHeaderIconAnimation() {
 		var headerIcon = document.querySelector('.header__icon');
 		var header = document.querySelector('.header__nav');
 		if (!headerIcon) return;
 
+		initTheme();
+
 		headerIcon.addEventListener('click', function () {
+			cycleTheme();
+
 			headerIcon.classList.remove('spring-effect');
 			void headerIcon.offsetWidth;
 			headerIcon.classList.add('spring-effect');
@@ -140,6 +165,7 @@
 	}
 
 	document.addEventListener("DOMContentLoaded", function () {
+		initTheme();
 		highlightCurrentPage();
 		initMermaidCharts();
 		initFiltering();
