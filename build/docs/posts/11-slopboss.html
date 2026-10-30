@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head profile="http://www.w3.org/2005/10/profile">
+      <meta charset="UTF-8">
+      <meta name="description" content="Personal blog">
+      <meta name="author" content="Denis Angelov">
+      <meta name=viewport content="width=device-width, initial-scale=1">
+      <title>SlopBoss: A Board-Driven Orchestrator for Multi-Agent Development</title>
+      <link rel="stylesheet" href="/css/reset.css">
+      <link rel="stylesheet" href="/css/prism.css">
+      <link rel="stylesheet" href="/css/index.92a3af9c-98dd-5080-9854-18ce1c678515.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  </head>  <body>
+  <div class="main-container">
+    <header>
+      <div class="header__icon"></div>
+      <nav class="header__nav shine-effect">
+        <a id="home" href="/index.html">home</a>
+        <a id="blog" href="/blog.html">blog</a>
+        <!-- <a id="cv" href="/cv.html">cv</a> -->
+      </nav>
+    </header>    <div class="post__back">
+
+      <a href="/blog.html" class="post__back-button"> < Back </a>
+    
+    </div>
+    <main>
+      <div class="wrapper">
+        <div class="masthead">
+          <div class="post__tags">
+            Oct 30, 2026 &lt 2026 | Go | AI | Tools &gt
+          </div>
+          <h1 class="fade-up-effect">
+            SlopBoss: A Board-Driven Orchestrator for Multi-Agent Development 
+          </h1>
+    
+        </div>
+      </div>
+      <article class="post">
+        <p>A few months ago I got tired of babysitting a single AI coding agent.
+The loop is always the same: prompt, wait, review, prompt again.
+Meanwhile the backlog keeps growing and the agents keep forgetting what
+they were doing. So I built <strong>SlopBoss</strong> — a small Go
+binary that treats a Markdown task board as the single source of truth
+and reconciles a fleet of coding agents against it, continuously, until
+the work is done.</p>
+<p>The idea is borrowed from Kubernetes: you declare <em>desired
+state</em> (the board), and a control loop makes <em>observed state</em>
+(running sessions) converge to it. No database, no hidden state —
+everything is a file you can read, edit, and commit.</p>
+<h2 id="the-board">The board</h2>
+<p>SlopBoss operates on a handful of Markdown files at the repo
+root:</p>
+<ul>
+<li><code>BACKLOG.md</code> — prioritized backlog, groomed by a Team
+Lead agent.</li>
+<li><code>TASKS.md</code> — one lane per Dev Agent with the task
+currently in flight.</li>
+<li><code>ARCHIVE.md</code> — completed work history.</li>
+<li><code>AGENTS.md</code>, <code>DEV_AGENT.md</code>,
+<code>TEAM_LEAD_AGENT.md</code> — role instructions shared with every
+agent.</li>
+<li><code>TECH.md</code> — project tech context.</li>
+<li><code>CONFIG.md</code> — repo, base branch, backend, agent count,
+per-role models.</li>
+</ul>
+<p>A task is just a small Markdown block:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">### Add dark-mode toggle to settings</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Owner: (unassigned)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Branch: agent/1/dark-mode-toggle</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Status: Backlog</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Add a theme toggle to the settings page that persists the choice</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>to localStorage and respects prefers-color-scheme on first load.</span></code></pre></div>
+<h2 id="how-it-works">How it works</h2>
+<p>Every ten seconds SlopBoss reads the board, diffs it against the
+sessions that are actually running, and starts or cancels agent
+processes until reality matches the board:</p>
+<ol>
+<li><strong>Poll</strong> — read the board files.</li>
+<li><strong>Reconcile</strong> — compare each task's assigned lane
+against running sessions.</li>
+<li><strong>Converge</strong> — start a session for any
+assigned-but-not-running task; cancel sessions whose task moved,
+changed, or already merged to <code>main</code>. Cancellation is
+debounced so a board rewrite at completion time doesn't kill live
+work.</li>
+<li><strong>Repeat</strong> — the TUI refreshes continuously; the loop
+runs until you stop it.</li>
+</ol>
+<p>A task that merged to <code>main</code> but was never archived still
+counts as done, so dependent tasks never get stuck behind a cancelled
+session.</p>
+<h2 id="division-of-labor">Division of labor</h2>
+<ul>
+<li><strong>Team Lead</strong> — grooms the backlog, promotes the top
+item into a Dev Agent lane, runs as a one-off interactive session
+(<code>slopboss groom</code>).</li>
+<li><strong>Dev Agents</strong> — N parallel agents, each in its own
+cloned workspace and branch, implementing, verifying, and archiving
+their assigned task.</li>
+</ul>
+<h2 id="backends">Backends</h2>
+<p>SlopBoss is backend-agnostic. Run on Codex (default), Claude Code,
+OpenCode, or Antigravity with a flag:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">slopboss</span> run <span class="at">--provider</span> claude</span></code></pre></div>
+<p>Per-role models are configured in <code>CONFIG.md</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Codex dev-agent model: gpt-6-luna</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Codex team-lead model: gpt-6-luna</span></code></pre></div>
+<h2 id="quickstart">Quickstart</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Provision the board, workspaces, and TECH.md</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">slopboss</span> setup</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Groom the backlog with the Team Lead</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">slopboss</span> groom</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Start the control loop with a live TUI</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">slopboss</span> run</span></code></pre></div>
+<p><code>run</code> keeps going until <code>Ctrl-C</code>, then cancels
+in-flight sessions and exits cleanly.</p>
+<h2 id="evals">Evals</h2>
+<p>You can A/B models, prompts, and backends on the same ticket. Each
+variant runs in an isolated git worktree, and SlopBoss collects token
+and diff metrics into <code>report.md</code>. You don't hand-write the
+config — the Team Lead designs it interactively via
+<code>slopboss eval groom</code>.</p>
+<h2 id="why-files-over-state">Why files over state</h2>
+<p>The whole point is that there is no database and no shadow state.
+Restart SlopBoss at any time and it picks up exactly where it left off,
+because the board <em>is</em> the state. Hand edits and agent edits both
+take effect on the next poll. That property — convergence toward a
+declarative source of truth — is what made me reach for a
+Kubernetes-style reconcile loop instead of a fire-and-forget
+dispatcher.</p>
+<p>Source: <a
+href="https://github.com/de-angelov/slopboss">github.com/de-angelov/slopboss</a></p>
+        <br>
+        <br>
+      </article>
+    </main>
+    <footer>
+      © 2026  Denis Angelov. All rights reserved.
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="/js/index.92a3af9c-98dd-5080-9854-18ce1c678515.js"></script>
+    <script src="/js/prism.js"></script>  </div>
+  </body>
+</html>

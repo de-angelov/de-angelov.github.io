@@ -1,7 +1,7 @@
 ---
 title: "FunScript: Reinventing Functional CoffeeScript"
 tags: ["2026", "FP", "TypeScript"]
-date: Oct 27, 2026
+date: Oct 30, 2026
 ---
 
 *Disclaimer: FunScript is currently an idea and design exploration — there is no compiler implementation yet. It is a thought experiment exploring what the ideal functional notation for the TypeScript and Effect ecosystem could look like.*
@@ -33,16 +33,16 @@ export const User = Schema.Struct({
 });
 export type User = typeof User.Type;
 
-export class NotFound extends Schema.TaggedError&lt;NotFound&gt;()("NotFound", {
+export class NotFound extends Schema.TaggedError&lt;NotFound>()("NotFound", {
   id: Schema.String,
 }) {}
 
 export class UserRepo extends Context.Service&lt;UserRepo, {
-  readonly find: (id: string) =&gt; Effect.Effect&lt;User, NotFound&gt;;
-}&gt;()("UserRepo") {}
+  readonly find: (id: string) => Effect.Effect&lt;User, NotFound>;
+}>()("UserRepo") {}
 
 export const UserRepoLive = Layer.succeed(UserRepo, {
-  find: (id) =&gt;
+  find: (id) =>
     id === "1"
       ? Effect.succeed({ id: "1" as Schema.UUID, name: "Ada" as Schema.NonEmptyString })
       : Effect.fail(new NotFound({ id })),
@@ -70,20 +70,20 @@ export schema User = {
 export error NotFound(id: string)
 
 export service UserRepo
-  find: (id: string) -&gt; Effect&lt;User, NotFound&gt;
+  find: (id: string) -> Effect&lt;User, NotFound>
 
 export UserRepoLive = Layer.succeed(UserRepo, {
-  find: (id) -&gt;
+  find: (id) ->
     match
-      | id == "1" -&gt; Effect.succeed({ id: UUID("1"), name: NonEmptyString("Ada") })
-      | _ -&gt; Effect.fail(NotFound(id))
+      | id == "1" -> Effect.succeed({ id: UUID("1"), name: NonEmptyString("Ada") })
+      | _ -> Effect.fail(NotFound(id))
 })
 
 export main =
   effect
     user &lt;- UserRepo.find("1")
     user.name
-  |&gt; Effect.provide(UserRepoLive)
+  |> Effect.provide(UserRepoLive)
 </code>
 </pre>
 
@@ -127,17 +127,17 @@ In TypeScript, static types and runtime validators often drift apart, or require
 # 1. Branded &amp; refined scalar Schema + static type
 export schema Username =
   string
-  |&gt; Schema.trimmed
-  |&gt; Schema.minLength(3)
-  |&gt; Schema.brand("Username")
+  |> Schema.trimmed
+  |> Schema.minLength(3)
+  |> Schema.brand("Username")
 
 # 2. Struct Schema with default (=) fields and explicit Option (no ?)
 export schema User = {
   id: UUID
   name: Username
-  age: Int |&gt; Schema.between(0, 150)
+  age: Int |> Schema.between(0, 150)
   role: "admin" | "member" = "member"
-  bio: Option&lt;NonEmptyString&gt;
+  bio: Option&lt;NonEmptyString>
 }
 
 # 3. Tagged union (Data.TaggedEnum + constructors + Schema.Union)
@@ -146,11 +146,11 @@ export schema Shape =
   | Rect(width: number, height: number)
 
 # 4. Compile-time TypeScript alias (no runtime output)
-export schema Lookup = (id: UUID) -&gt; Effect&lt;User, NotFound&gt;
+export schema Lookup = (id: UUID) -> Effect&lt;User, NotFound>
 </code>
 </pre>
 
-Because `User` and `Shape` exist at both the type level and value level, you can annotate parameters with `: User` and decode untrusted JSON with `raw |&gt; Schema.decode(User)` from a single declaration.
+Because `User` and `Shape` exist at both the type level and value level, you can annotate parameters with `: User` and decode untrusted JSON with `raw |> Schema.decode(User)` from a single declaration.
 
 Every data `schema` is also a **validating constructor**, which replaces type casts entirely (Option C: no `as` keyword in the language). `UUID("1")` and `User({ ... })` lower to `Schema.make`, and when the argument is a literal the compiler runs the schema at compile time — so `Age(200)` is a compile error, and a branded type can never be forged with `as`:
 
@@ -158,8 +158,8 @@ Every data `schema` is also a **validating constructor**, which replaces type ca
 <code class="language-js">
 ada = User({ id: UUID("0b9e6c1e-5f6a-4c6e-9a43-0c2f3b1d9e7a"), name: Username("ada"), age: 36, bio: None })
 
-# x as User   -&gt; parser error: use raw |&gt; Schema.decode(User)
-# Age(200)    -&gt; compile error: Expected a number between 0 and 150, actual 200
+# x as User   -> parser error: use raw |> Schema.decode(User)
+# Age(200)    -> compile error: Expected a number between 0 and 150, actual 200
 </code>
 </pre>
 
@@ -173,20 +173,20 @@ There is no `if`/`else`, `switch`, or ternary `? :`. Instead, `match` has two fo
 
 <pre>
 <code class="language-js">
-export describe = (shape: Shape) -&gt;
+export describe = (shape: Shape) ->
   match shape
-    | Circle(0) -&gt; "point"
-    | Circle(r) when r |&gt; Number.greaterThan(100) -&gt; "huge circle ({r})"
-    | Circle(r) -&gt; "circle ({r})"
-    | Rect(w, h) -&gt; "{w} by {h}"
+    | Circle(0) -> "point"
+    | Circle(r) when r |> Number.greaterThan(100) -> "huge circle ({r})"
+    | Circle(r) -> "circle ({r})"
+    | Rect(w, h) -> "{w} by {h}"
 
-# Or-patterns (`| A | B -&gt;`) and pipeline `|&gt; match`
-export findName = (users: Array&lt;User&gt;, id: string) -&gt;
+# Or-patterns (`| A | B ->`) and pipeline `|> match`
+export findName = (users: Array&lt;User>, id: string) ->
   users
-  |&gt; Array.findFirst((u) -&gt; u.id == id)
-  |&gt; match
-    | Some({ name }) -&gt; name
-    | None -&gt; "anonymous"
+  |> Array.findFirst((u) -> u.id == id)
+  |> match
+    | Some({ name }) -> name
+    | None -> "anonymous"
 </code>
 </pre>
 
@@ -197,15 +197,15 @@ When `match` has no scrutinee expression, each arm is a boolean condition that c
 <pre>
 <code class="language-js">
 # Inline two-branch expression (comparisons are pure data-last functions)
-sign = match | n |&gt; Number.greaterThan(0) -&gt; "positive" | _ -&gt; "non-positive"
+sign = match | n |> Number.greaterThan(0) -> "positive" | _ -> "non-positive"
 
 # Multi-branch block
 tier =
   match
-    | score |&gt; Number.greaterThanOrEqualTo(90) and verified -&gt; "platinum"
-    | score |&gt; Number.greaterThanOrEqualTo(75) -&gt; "gold"
-    | score |&gt; Number.greaterThanOrEqualTo(50) -&gt; "silver"
-    | _ -&gt; "bronze"
+    | score |> Number.greaterThanOrEqualTo(90) and verified -> "platinum"
+    | score |> Number.greaterThanOrEqualTo(75) -> "gold"
+    | score |> Number.greaterThanOrEqualTo(50) -> "silver"
+    | _ -> "bronze"
 </code>
 </pre>
 
@@ -225,9 +225,9 @@ Data flows left-to-right using F#-style pipelines that compile to Effect's `pipe
 <code class="language-js">
 score =
   rawInput
-  |&gt; parseScore
-  |&gt; clamp(0, 100, _)
-  |&gt; formatScore(_, "en-US")
+  |> parseScore
+  |> clamp(0, 100, _)
+  |> formatScore(_, "en-US")
 </code>
 </pre>
 
@@ -242,10 +242,10 @@ To eliminate repetitive module prefixes (`Array.`, `Option.`, `Effect.`), bare f
 # Clean, readable pipelines without repetitive "Array." prefixes:
 topActive =
   users
-  |&gt; filter((u) -&gt; u.active)
-  |&gt; sortBy((u) -&gt; u.name)
-  |&gt; take(10)
-  |&gt; map((u) -&gt; u.name)
+  |> filter((u) -> u.active)
+  |> sortBy((u) -> u.name)
+  |> take(10)
+  |> map((u) -> u.name)
 </code>
 </pre>
 
@@ -263,10 +263,10 @@ Shallow overrides emit a plain JS spread (`{ ...todo, completed: true }`). When 
 
 <pre>
 <code class="language-js">
-# Shallow -&gt; `{ ...todo, completed: true }`
+# Shallow -> `{ ...todo, completed: true }`
 done = { ...todo, completed: true }
 
-# Deep dot-paths -&gt; `create(user, draft =&gt; { ... })`
+# Deep dot-paths -> `create(user, draft => { ... })`
 moved = {
   ...user
   age: user.age + 1
@@ -282,18 +282,18 @@ When you need step-by-step updates, array methods (`.push`, `.splice`, `.sort`),
 
 <pre>
 <code class="language-js">
-recordLogin = (user: User) -&gt;
+recordLogin = (user: User) ->
   mut draft = user
   draft.visits = draft.visits + 1
   draft.tags.push("active")
   match
-    | draft.visits &gt; 10 -&gt; draft.tier = "gold"
+    | draft.visits > 10 -> draft.tier = "gold"
   draft
 
 # Or inline in a pipeline:
 updated =
   user
-  |&gt; mut (d) -&gt; d.tags.push("onboarded")
+  |> mut (d) -> d.tags.push("onboarded")
 </code>
 </pre>
 
@@ -316,13 +316,13 @@ export schema Todo = {
   completed: boolean
 }
 
-export fetchTodo = (id: number) -&gt;
+export fetchTodo = (id: number) ->
   effect
     response &lt;- HttpClient.get("https://jsonplaceholder.typicode.com/todos/{id}")
-    todo &lt;- response |&gt; HttpClientResponse.schemaBodyJson(Todo)
+    todo &lt;- response |> HttpClientResponse.schemaBodyJson(Todo)
     { ...todo, completed: true }
-  |&gt; Effect.retry(Schedule.exponential("100 millis"))
-  |&gt; Effect.provide(FetchHttpClient.layer)
+  |> Effect.retry(Schedule.exponential("100 millis"))
+  |> Effect.provide(FetchHttpClient.layer)
 </code>
 </pre>
 
@@ -365,7 +365,7 @@ While sketching an implementation, you can drop `???` (or `??? "label"`) into an
 
 <pre>
 <code class="language-js">
-export checkout = (user: User, cart: Cart): Effect&lt;Receipt, PaymentError&gt; -&gt;
+export checkout = (user: User, cart: Cart): Effect&lt;Receipt, PaymentError> ->
   effect
     total = calculateTotal(cart)
     ??? "charge payment provider"
@@ -377,8 +377,8 @@ The compiler lowers `???` to a `never`-typed throw and queries TypeScript's `che
 <pre>
 <code class="language-bash">
 warning[funscript/typed-hole]: Unfinished hole `???` ("charge payment provider")
-  --&gt; src/checkout.fun:4:5
-  | Expected type: Effect&lt;Receipt, PaymentError, never&gt;
+  --> src/checkout.fun:4:5
+  | Expected type: Effect&lt;Receipt, PaymentError, never>
   | In scope:
   |   user  : User
   |   cart  : Cart
@@ -399,18 +399,18 @@ The goal is that **the shortest way to write something is also the safe way**. B
 | Hide time or randomness | `Date.now()`, `Math.random()`, `performance.now()` | `DateTime.now`, `Clock.currentTimeMillis`, `Random.next` — controlled by `TestClock` in tests |
 | Read config from globals | `process.env.PORT` | `Schema.Config("PORT", Port)`, `Config.redacted("DATABASE_URL")` |
 | Run an effect mid-program | `Effect.runPromise(...)` in a helper | Return the `Effect`; `export main` in an entry module is run once with `runMain` |
-| Cast past a schema | `"1" as UUID`, `input as User` | `UUID("1")` (validated at compile time) or `raw \|&gt; Schema.decode(User)` |
+| Cast past a schema | `"1" as UUID`, `input as User` | `UUID("1")` (validated at compile time) or `raw \|> Schema.decode(User)` |
 
 Time becomes testable without real waiting:
 
 <pre>
 <code class="language-js">
-export isExpired = (token: Token) -&gt;
+export isExpired = (token: Token) ->
   effect
     now &lt;- DateTime.now
     DateTime.greaterThan(now, token.expiresAt)
 
-it.effect("expires after one hour", -&gt;
+it.effect("expires after one hour", ->
   effect
     token &lt;- issueToken(user)
     _ &lt;- TestClock.adjust("61 minutes")
@@ -439,10 +439,10 @@ FunScript doesn't need a `go`, `chan`, or `select` keyword. In **Effect v4**, **
 | Go | Effect v4 | FunScript |
 | --- | --- | --- |
 | `go worker()` | `Effect.forkScoped` | `_ &lt;- Effect.forkScoped(worker)` |
-| `chan T` (buffered) | `Queue.bounded&lt;T&gt;(n)` | `jobs &lt;- Queue.bounded&lt;Job&gt;(100)` |
+| `chan T` (buffered) | `Queue.bounded&lt;T>(n)` | `jobs &lt;- Queue.bounded&lt;Job>(100)` |
 | `ch &lt;- v` / `&lt;-ch` | `Queue.offer` / `Queue.take` | `_ &lt;- Queue.offer(jobs, j)` / `j &lt;- Queue.take(jobs)` |
 | `select` | `Effect.race` | `data &lt;- Effect.race(primary, replica)` |
-| `errgroup` / pool | `Effect.forEach(..., { concurrency })` | `users &lt;- ids \|&gt; Effect.forEach(fetch, { concurrency: 8 })` |
+| `errgroup` / pool | `Effect.forEach(..., { concurrency })` | `users &lt;- ids \|> Effect.forEach(fetch, { concurrency: 8 })` |
 
 Unlike Go goroutines, Effect fibers are **structured**: tied to an enclosing `Scope` or parent fiber. When a scope finishes or a task fails, child fibers are interrupted automatically — no goroutine leaks, and no manual `context.Context` plumbing:
 
@@ -451,11 +451,11 @@ Unlike Go goroutines, Effect fibers are **structured**: tied to an enclosing `Sc
 # Producer / consumer pipeline with 4 background workers
 export pipeline =
   effect
-    jobs &lt;- Queue.bounded&lt;Job&gt;(100)
+    jobs &lt;- Queue.bounded&lt;Job>(100)
     _ &lt;- Effect.forkScoped(producer(jobs))
-    _ &lt;- Array.range(1, 4) \|&gt; Effect.forEach((id) -&gt; Effect.forkScoped(worker(jobs, id)))
+    _ &lt;- Array.range(1, 4) \|> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
     Effect.never
-  \|&gt; Effect.scoped   # closing the scope cleans up all workers automatically
+  \|> Effect.scoped   # closing the scope cleans up all workers automatically
 </code>
 </pre>
 
@@ -468,10 +468,10 @@ export pipeline =
 | Immutable binding | `x = 1` | `const x = 1;` |
 | Local mutable / draft | `mut x = user` / `x.a = 1` | `let` / Mutative `create(user, ...)` |
 | Shallow / deep copy | `{ ...u, a.b: 1 }` | `{ ...u, ... }` / Mutative `create(...)` |
-| Function | `(a: number, b: number) -&gt; a + b` | `(a: number, b: number) =&gt; a + b` |
-| Pipeline &amp; placeholder | `x \|&gt; f(a) \|&gt; g(1, _)` | `pipe(x, f(a), (__p) =&gt; g(1, __p))` |
-| Pattern match | `match x \| A(v) -&gt; v` | `match(x).with({ _tag: "A" }, ...).exhaustive()` |
-| Boolean match | `match \| x \|&gt; Number.greaterThan(0) -&gt; "pos" \| _ -&gt; "neg"` | `Number.greaterThan(x, 0) ? "pos" : "neg"` |
+| Function | `(a: number, b: number) -> a + b` | `(a: number, b: number) => a + b` |
+| Pipeline &amp; placeholder | `x \|> f(a) \|> g(1, _)` | `pipe(x, f(a), (__p) => g(1, __p))` |
+| Pattern match | `match x \| A(v) -> v` | `match(x).with({ _tag: "A" }, ...).exhaustive()` |
+| Boolean match | `match \| x \|> Number.greaterThan(0) -> "pos" \| _ -> "neg"` | `Number.greaterThan(x, 0) ? "pos" : "neg"` |
 | Schema &amp; type | `schema User = { id: UUID }` | `Schema.Struct(...)` + `typeof User.Type` |
 | Schema constructor | `UUID("1")` / `User({ ... })` | `Schema.UUID.make("1")` (literals checked at compile time) |
 | Tagged union | `schema Shape = \| Circle(r: number)` | `Data.TaggedEnum` + `Schema.Union` |
@@ -479,6 +479,6 @@ export pipeline =
 | Service | `service Repo ...` | `class Repo extends Context.Service...` |
 | Direct service call | `x &lt;- Repo.find(id)` | `const x = yield* (yield* Repo).find(id);` |
 | Effect block | `effect` + `x &lt;- eff` | `Effect.gen(function* () { const x = yield* eff; })` |
-| Defect demotion | `eff \|&gt; orDie` | `pipe(eff, Effect.orDie)` |
+| Defect demotion | `eff \|> orDie` | `pipe(eff, Effect.orDie)` |
 | Fork / channel | `forkScoped(eff)` / `Queue.bounded(n)` | Structured green thread / buffered channel |
 | Typed hole | `??? "todo"` | `never` throw + contextual type diagnostic |
