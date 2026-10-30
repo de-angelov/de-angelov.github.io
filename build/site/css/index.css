@@ -444,13 +444,13 @@ b {
 }
 
 @keyframes fadeScaleDown {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0); }
+  from { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); box-shadow: 0 0 0 rgba(192, 132, 252, 0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(6px); filter: blur(4px); box-shadow: 0 0 1.5rem rgba(192, 132, 252, 0.35); }
 }
 
 @keyframes fadeScaleUp {
-  from { opacity: 0; transform: scale(0); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.96) translateY(8px); filter: blur(4px); box-shadow: 0 0 1.5rem rgba(192, 132, 252, 0.35); }
+  to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); box-shadow: 0 0 0 rgba(192, 132, 252, 0); }
 }
 
 :root,
