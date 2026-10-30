@@ -445,14 +445,14 @@ b {
 
 [data-theme="purple"] {
   --font-size: 1rem;
-  --nav-bg-color:  #2A1A3D;
-  --main-bg-color: #2A1A3D;
+  --nav-bg-color:  rgba(42, 26, 61, 0.7);
+  --main-bg-color: rgba(42, 26, 61, 0.55);
   --background-color: #120A1C;
   --main-text-color: #E9D5FF;
   --primary-color:  #C084FC;
   --padding: 1rem;
   --main-width: 140ch;
   --shadow: 0 3px 10px rgb(0 0 0 / 0.4);
-  --background-image: url("/images/background-purple.svg");
+  --background-image: url("/images/background.svg");
   --background-blend: normal;
 }
