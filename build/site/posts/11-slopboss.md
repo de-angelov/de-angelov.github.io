@@ -8,6 +8,12 @@ A few months ago I got tired of babysitting a single AI coding agent. The loop i
 
 The idea is borrowed from Kubernetes: you declare *desired state* (the board), and a control loop makes *observed state* (running sessions) converge to it. No database, no hidden state — everything is a file you can read, edit, and commit.
 
+<img
+  src="/images/slopboss-hero.png"
+  alt="slopboss mascot — a grinning corporate boss on a retro CRT monitor, surrounded by tiny robot developers"
+  width="45%"
+  style="display:block;margin:2rem auto;">
+
 ## The board
 
 SlopBoss operates on a handful of Markdown files at the repo root:
