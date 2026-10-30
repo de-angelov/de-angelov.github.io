@@ -39,7 +39,7 @@ a {
 }
 
 img {
-  border-radius: 10%;
+  border-radius: 1rem;
   overflow: hidden;
   max-width: 100%;
   height: auto;
@@ -413,7 +413,7 @@ b {
 .home-page__photo{
   max-width:  calc(var(--main-width)/5);
   margin: auto;
-  border-radius: 10%;
+  border-radius: 1rem;
   overflow: hidden;
   outline: 1rem solid var(-primary-color);
 }
