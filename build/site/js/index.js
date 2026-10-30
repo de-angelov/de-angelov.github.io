@@ -46,6 +46,10 @@
 		headerIcon.addEventListener('click', function () {
 			cycleTheme();
 
+			headerIcon.classList.remove('is-rotating');
+			void headerIcon.offsetWidth;
+			headerIcon.classList.add('is-rotating');
+
 			headerIcon.classList.remove('spring-effect');
 			void headerIcon.offsetWidth;
 			headerIcon.classList.add('spring-effect');
