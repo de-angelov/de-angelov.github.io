@@ -453,6 +453,6 @@ b {
   --padding: 1rem;
   --main-width: 140ch;
   --shadow: 0 3px 10px rgb(0 0 0 / 0.4);
-  --background-image: url("/images/background.svg");
-  --background-blend: multiply;
+  --background-image: url("/images/background-purple.svg");
+  --background-blend: normal;
 }
