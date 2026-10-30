@@ -124,7 +124,7 @@ In TypeScript, static types and runtime validators often drift apart, or require
 
 <pre>
 <code class="language-js">
-# 1. Branded &amp; refined scalar Schema + static type
+# 1. Branded & refined scalar Schema + static type
 export schema Username =
   string
   |> Schema.trimmed
@@ -432,7 +432,7 @@ src/users.fun:18:5  error  `Effect.runPromise` outside an entry module
 
 ---
 
-### 8. Concurrency: Goroutines &amp; Channels for Free
+### 8. Concurrency: Goroutines & Channels for Free
 
 FunScript doesn't need a `go`, `chan`, or `select` keyword. In **Effect v4**, **fibers are green threads (goroutines)**, `Queue` is a channel, `Effect.race` is `select`, and worker pools are structured:
 
@@ -453,9 +453,9 @@ export pipeline =
   effect
     jobs &lt;- Queue.bounded&lt;Job>(100)
     _ &lt;- Effect.forkScoped(producer(jobs))
-    _ &lt;- Array.range(1, 4) \|> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
+    _ &lt;- Array.range(1, 4) |> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
     Effect.never
-  \|> Effect.scoped   # closing the scope cleans up all workers automatically
+  |> Effect.scoped   # closing the scope cleans up all workers automatically
 </code>
 </pre>
 
@@ -469,10 +469,10 @@ export pipeline =
 | Local mutable / draft | `mut x = user` / `x.a = 1` | `let` / Mutative `create(user, ...)` |
 | Shallow / deep copy | `{ ...u, a.b: 1 }` | `{ ...u, ... }` / Mutative `create(...)` |
 | Function | `(a: number, b: number) -> a + b` | `(a: number, b: number) => a + b` |
-| Pipeline &amp; placeholder | `x \|> f(a) \|> g(1, _)` | `pipe(x, f(a), (__p) => g(1, __p))` |
+| Pipeline & placeholder | `x \|> f(a) \|> g(1, _)` | `pipe(x, f(a), (__p) => g(1, __p))` |
 | Pattern match | `match x \| A(v) -> v` | `match(x).with({ _tag: "A" }, ...).exhaustive()` |
 | Boolean match | `match \| x \|> Number.greaterThan(0) -> "pos" \| _ -> "neg"` | `Number.greaterThan(x, 0) ? "pos" : "neg"` |
-| Schema &amp; type | `schema User = { id: UUID }` | `Schema.Struct(...)` + `typeof User.Type` |
+| Schema & type | `schema User = { id: UUID }` | `Schema.Struct(...)` + `typeof User.Type` |
 | Schema constructor | `UUID("1")` / `User({ ... })` | `Schema.UUID.make("1")` (literals checked at compile time) |
 | Tagged union | `schema Shape = \| Circle(r: number)` | `Data.TaggedEnum` + `Schema.Union` |
 | Typed error | `error NotFound(id: UUID)` | `class NotFound extends Schema.TaggedError...` |
