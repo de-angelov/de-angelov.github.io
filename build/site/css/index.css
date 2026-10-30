@@ -38,6 +38,13 @@ a {
   color: var(--primary-color)
 }
 
+img {
+  border-radius: 10%;
+  overflow: hidden;
+  max-width: 100%;
+  height: auto;
+}
+
 h1 {
   font-family: 'Roboto Slab', serif;
   color: var(--main-text-color);
