@@ -445,8 +445,8 @@ b {
 
 [data-theme="purple"] {
   --font-size: 1rem;
-  --nav-bg-color:  rgba(42, 26, 61, 0.55);
-  --main-bg-color: rgba(42, 26, 61, 0.4);
+  --nav-bg-color:  rgba(42, 26, 61, 0.8);
+  --main-bg-color: rgba(42, 26, 61, 0.75);
   --background-color: #120A1C;
   --main-text-color: #E9D5FF;
   --primary-color:  #C084FC;
