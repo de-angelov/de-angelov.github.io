@@ -15,7 +15,7 @@
 			.filter(x => x !== "");
 	}
 
-	var themes = ['light', 'dark', 'warm'];
+	var themes = ['light', 'dark', 'warm', 'purple'];
 
 	function applyTheme(theme) {
 		document.documentElement.setAttribute('data-theme', theme);

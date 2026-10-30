@@ -467,3 +467,16 @@ b {
   --shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   --background-image: none;
 }
+
+[data-theme="purple"] {
+  --font-size: 1rem;
+  --nav-bg-color:  #2A1A3D;
+  --main-bg-color: #2A1A3D;
+  --background-color: #1A1025;
+  --main-text-color: #E9D5FF;
+  --primary-color:  #C084FC;
+  --padding: 1rem;
+  --main-width: 140ch;
+  --shadow: 0 3px 10px rgb(0 0 0 / 0.4);
+  --background-image: none;
+}
