@@ -540,11 +540,6 @@ the safe way</strong>. Beyond the syntax above,
 <code>funscript check</code> enforces a few rules that cost zero
 keywords, each backed by something Effect already ships:</p>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr>
 <th>You cannot...</th>
@@ -555,29 +550,23 @@ keywords, each backed by something Effect already ships:</p>
 <tbody>
 <tr>
 <td>Hide time or randomness</td>
-<td><code>Date.now()</code>, <code>Math.random()</code>,
-<code>performance.now()</code></td>
-<td><code>DateTime.now</code>, <code>Clock.currentTimeMillis</code>,
-<code>Random.next</code> — controlled by <code>TestClock</code> in
-tests</td>
+<td><code>Date.now()</code>, <code>Math.random()</code>, <code>performance.now()</code></td>
+<td><code>DateTime.now</code>, <code>Clock.currentTimeMillis</code>, <code>Random.next</code> — controlled by <code>TestClock</code> in tests</td>
 </tr>
 <tr>
 <td>Read config from globals</td>
 <td><code>process.env.PORT</code></td>
-<td><code>Schema.Config("PORT", Port)</code>,
-<code>Config.redacted("DATABASE_URL")</code></td>
+<td><code>Schema.Config("PORT", Port)</code>, <code>Config.redacted("DATABASE_URL")</code></td>
 </tr>
 <tr>
 <td>Run an effect mid-program</td>
 <td><code>Effect.runPromise(...)</code> in a helper</td>
-<td>Return the <code>Effect</code>; <code>export main</code> in an entry
-module is run once with <code>runMain</code></td>
+<td>Return the <code>Effect</code>; <code>export main</code> in an entry module is run once with <code>runMain</code></td>
 </tr>
 <tr>
 <td>Cast past a schema</td>
 <td><code>"1" as UUID</code>, <code>input as User</code></td>
-<td><code>UUID("1")</code> (validated at compile time) or
-<code>raw \|&gt; Schema.decode(User)</code></td>
+<td><code>UUID("1")</code> (validated at compile time) or <code>raw |> Schema.decode(User)</code></td>
 </tr>
 </tbody>
 </table>
@@ -618,11 +607,6 @@ Goroutines &amp; Channels for Free</h3>
 <code>Queue</code> is a channel, <code>Effect.race</code> is
 <code>select</code>, and worker pools are structured:</p>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr>
 <th>Go</th>
@@ -634,28 +618,27 @@ Goroutines &amp; Channels for Free</h3>
 <tr>
 <td><code>go worker()</code></td>
 <td><code>Effect.forkScoped</code></td>
-<td><code>_ &amp;lt;- Effect.forkScoped(worker)</code></td>
+<td><code>_ &lt;- Effect.forkScoped(worker)</code></td>
 </tr>
 <tr>
 <td><code>chan T</code> (buffered)</td>
-<td><code>Queue.bounded&amp;lt;T&gt;(n)</code></td>
-<td><code>jobs &amp;lt;- Queue.bounded&amp;lt;Job&gt;(100)</code></td>
+<td><code>Queue.bounded&lt;T>(n)</code></td>
+<td><code>jobs &lt;- Queue.bounded&lt;Job>(100)</code></td>
 </tr>
 <tr>
-<td><code>ch &amp;lt;- v</code> / <code>&amp;lt;-ch</code></td>
+<td><code>ch &lt;- v</code> / <code>&lt;-ch</code></td>
 <td><code>Queue.offer</code> / <code>Queue.take</code></td>
-<td><code>_ &amp;lt;- Queue.offer(jobs, j)</code> /
-<code>j &amp;lt;- Queue.take(jobs)</code></td>
+<td><code>_ &lt;- Queue.offer(jobs, j)</code> / <code>j &lt;- Queue.take(jobs)</code></td>
 </tr>
 <tr>
 <td><code>select</code></td>
 <td><code>Effect.race</code></td>
-<td><code>data &amp;lt;- Effect.race(primary, replica)</code></td>
+<td><code>data &lt;- Effect.race(primary, replica)</code></td>
 </tr>
 <tr>
 <td><code>errgroup</code> / pool</td>
 <td><code>Effect.forEach(..., { concurrency })</code></td>
-<td><code>users &amp;lt;- ids \|&gt; Effect.forEach(fetch, { concurrency: 8 })</code></td>
+<td><code>users &lt;- ids |> Effect.forEach(fetch, { concurrency: 8 })</code></td>
 </tr>
 </tbody>
 </table>
@@ -679,11 +662,6 @@ export pipeline =
 <hr />
 <h2 id="summary-cheat-sheet">Summary Cheat Sheet</h2>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr>
 <th>Construct</th>
@@ -709,38 +687,37 @@ export pipeline =
 </tr>
 <tr>
 <td>Function</td>
-<td><code>(a: number, b: number) -&gt; a + b</code></td>
-<td><code>(a: number, b: number) =&gt; a + b</code></td>
+<td><code>(a: number, b: number) -> a + b</code></td>
+<td><code>(a: number, b: number) => a + b</code></td>
 </tr>
 <tr>
-<td>Pipeline &amp; placeholder</td>
-<td><code>x \|&gt; f(a) \|&gt; g(1, _)</code></td>
-<td><code>pipe(x, f(a), (__p) =&gt; g(1, __p))</code></td>
+<td>Pipeline & placeholder</td>
+<td><code>x |> f(a) |> g(1, _)</code></td>
+<td><code>pipe(x, f(a), (__p) => g(1, __p))</code></td>
 </tr>
 <tr>
 <td>Pattern match</td>
-<td><code>match x \| A(v) -&gt; v</code></td>
+<td><code>match x | A(v) -> v</code></td>
 <td><code>match(x).with({ _tag: "A" }, ...).exhaustive()</code></td>
 </tr>
 <tr>
 <td>Boolean match</td>
-<td><code>match \| x \|&gt; Number.greaterThan(0) -&gt; "pos" \| _ -&gt; "neg"</code></td>
+<td><code>match | x |> Number.greaterThan(0) -> "pos" | _ -> "neg"</code></td>
 <td><code>Number.greaterThan(x, 0) ? "pos" : "neg"</code></td>
 </tr>
 <tr>
-<td>Schema &amp; type</td>
+<td>Schema & type</td>
 <td><code>schema User = { id: UUID }</code></td>
 <td><code>Schema.Struct(...)</code> + <code>typeof User.Type</code></td>
 </tr>
 <tr>
 <td>Schema constructor</td>
 <td><code>UUID("1")</code> / <code>User({ ... })</code></td>
-<td><code>Schema.UUID.make("1")</code> (literals checked at compile
-time)</td>
+<td><code>Schema.UUID.make("1")</code> (literals checked at compile time)</td>
 </tr>
 <tr>
 <td>Tagged union</td>
-<td><code>schema Shape = \| Circle(r: number)</code></td>
+<td><code>schema Shape = | Circle(r: number)</code></td>
 <td><code>Data.TaggedEnum</code> + <code>Schema.Union</code></td>
 </tr>
 <tr>
@@ -755,17 +732,17 @@ time)</td>
 </tr>
 <tr>
 <td>Direct service call</td>
-<td><code>x &amp;lt;- Repo.find(id)</code></td>
+<td><code>x &lt;- Repo.find(id)</code></td>
 <td><code>const x = yield* (yield* Repo).find(id);</code></td>
 </tr>
 <tr>
 <td>Effect block</td>
-<td><code>effect</code> + <code>x &amp;lt;- eff</code></td>
+<td><code>effect</code> + <code>x &lt;- eff</code></td>
 <td><code>Effect.gen(function* () { const x = yield* eff; })</code></td>
 </tr>
 <tr>
 <td>Defect demotion</td>
-<td><code>eff \|&gt; orDie</code></td>
+<td><code>eff |> orDie</code></td>
 <td><code>pipe(eff, Effect.orDie)</code></td>
 </tr>
 <tr>

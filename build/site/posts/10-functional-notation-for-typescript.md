@@ -394,12 +394,37 @@ Typed holes emit warnings during `funscript dev` and `funscript test` (so you ca
 
 The goal is that **the shortest way to write something is also the safe way**. Beyond the syntax above, `funscript check` enforces a few rules that cost zero keywords, each backed by something Effect already ships:
 
-| You cannot... | Rejected | Write instead |
-| --- | --- | --- |
-| Hide time or randomness | `Date.now()`, `Math.random()`, `performance.now()` | `DateTime.now`, `Clock.currentTimeMillis`, `Random.next` — controlled by `TestClock` in tests |
-| Read config from globals | `process.env.PORT` | `Schema.Config("PORT", Port)`, `Config.redacted("DATABASE_URL")` |
-| Run an effect mid-program | `Effect.runPromise(...)` in a helper | Return the `Effect`; `export main` in an entry module is run once with `runMain` |
-| Cast past a schema | `"1" as UUID`, `input as User` | `UUID("1")` (validated at compile time) or `raw \|> Schema.decode(User)` |
+<table>
+<thead>
+<tr>
+<th>You cannot...</th>
+<th>Rejected</th>
+<th>Write instead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hide time or randomness</td>
+<td><code>Date.now()</code>, <code>Math.random()</code>, <code>performance.now()</code></td>
+<td><code>DateTime.now</code>, <code>Clock.currentTimeMillis</code>, <code>Random.next</code> — controlled by <code>TestClock</code> in tests</td>
+</tr>
+<tr>
+<td>Read config from globals</td>
+<td><code>process.env.PORT</code></td>
+<td><code>Schema.Config("PORT", Port)</code>, <code>Config.redacted("DATABASE_URL")</code></td>
+</tr>
+<tr>
+<td>Run an effect mid-program</td>
+<td><code>Effect.runPromise(...)</code> in a helper</td>
+<td>Return the <code>Effect</code>; <code>export main</code> in an entry module is run once with <code>runMain</code></td>
+</tr>
+<tr>
+<td>Cast past a schema</td>
+<td><code>"1" as UUID</code>, <code>input as User</code></td>
+<td><code>UUID("1")</code> (validated at compile time) or <code>raw |> Schema.decode(User)</code></td>
+</tr>
+</tbody>
+</table>
 
 Time becomes testable without real waiting:
 
@@ -436,13 +461,42 @@ src/users.fun:18:5  error  `Effect.runPromise` outside an entry module
 
 FunScript doesn't need a `go`, `chan`, or `select` keyword. In **Effect v4**, **fibers are green threads (goroutines)**, `Queue` is a channel, `Effect.race` is `select`, and worker pools are structured:
 
-| Go | Effect v4 | FunScript |
-| --- | --- | --- |
-| `go worker()` | `Effect.forkScoped` | `_ &lt;- Effect.forkScoped(worker)` |
-| `chan T` (buffered) | `Queue.bounded&lt;T>(n)` | `jobs &lt;- Queue.bounded&lt;Job>(100)` |
-| `ch &lt;- v` / `&lt;-ch` | `Queue.offer` / `Queue.take` | `_ &lt;- Queue.offer(jobs, j)` / `j &lt;- Queue.take(jobs)` |
-| `select` | `Effect.race` | `data &lt;- Effect.race(primary, replica)` |
-| `errgroup` / pool | `Effect.forEach(..., { concurrency })` | `users &lt;- ids \|> Effect.forEach(fetch, { concurrency: 8 })` |
+<table>
+<thead>
+<tr>
+<th>Go</th>
+<th>Effect v4</th>
+<th>FunScript</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>go worker()</code></td>
+<td><code>Effect.forkScoped</code></td>
+<td><code>_ &lt;- Effect.forkScoped(worker)</code></td>
+</tr>
+<tr>
+<td><code>chan T</code> (buffered)</td>
+<td><code>Queue.bounded&lt;T>(n)</code></td>
+<td><code>jobs &lt;- Queue.bounded&lt;Job>(100)</code></td>
+</tr>
+<tr>
+<td><code>ch &lt;- v</code> / <code>&lt;-ch</code></td>
+<td><code>Queue.offer</code> / <code>Queue.take</code></td>
+<td><code>_ &lt;- Queue.offer(jobs, j)</code> / <code>j &lt;- Queue.take(jobs)</code></td>
+</tr>
+<tr>
+<td><code>select</code></td>
+<td><code>Effect.race</code></td>
+<td><code>data &lt;- Effect.race(primary, replica)</code></td>
+</tr>
+<tr>
+<td><code>errgroup</code> / pool</td>
+<td><code>Effect.forEach(..., { concurrency })</code></td>
+<td><code>users &lt;- ids |> Effect.forEach(fetch, { concurrency: 8 })</code></td>
+</tr>
+</tbody>
+</table>
 
 Unlike Go goroutines, Effect fibers are **structured**: tied to an enclosing `Scope` or parent fiber. When a scope finishes or a task fails, child fibers are interrupted automatically — no goroutine leaks, and no manual `context.Context` plumbing:
 
@@ -463,22 +517,99 @@ export pipeline =
 
 ## Summary Cheat Sheet
 
-| Construct | Syntax | Compiles to |
-| --- | --- | --- |
-| Immutable binding | `x = 1` | `const x = 1;` |
-| Local mutable / draft | `mut x = user` / `x.a = 1` | `let` / Mutative `create(user, ...)` |
-| Shallow / deep copy | `{ ...u, a.b: 1 }` | `{ ...u, ... }` / Mutative `create(...)` |
-| Function | `(a: number, b: number) -> a + b` | `(a: number, b: number) => a + b` |
-| Pipeline & placeholder | `x \|> f(a) \|> g(1, _)` | `pipe(x, f(a), (__p) => g(1, __p))` |
-| Pattern match | `match x \| A(v) -> v` | `match(x).with({ _tag: "A" }, ...).exhaustive()` |
-| Boolean match | `match \| x \|> Number.greaterThan(0) -> "pos" \| _ -> "neg"` | `Number.greaterThan(x, 0) ? "pos" : "neg"` |
-| Schema & type | `schema User = { id: UUID }` | `Schema.Struct(...)` + `typeof User.Type` |
-| Schema constructor | `UUID("1")` / `User({ ... })` | `Schema.UUID.make("1")` (literals checked at compile time) |
-| Tagged union | `schema Shape = \| Circle(r: number)` | `Data.TaggedEnum` + `Schema.Union` |
-| Typed error | `error NotFound(id: UUID)` | `class NotFound extends Schema.TaggedError...` |
-| Service | `service Repo ...` | `class Repo extends Context.Service...` |
-| Direct service call | `x &lt;- Repo.find(id)` | `const x = yield* (yield* Repo).find(id);` |
-| Effect block | `effect` + `x &lt;- eff` | `Effect.gen(function* () { const x = yield* eff; })` |
-| Defect demotion | `eff \|> orDie` | `pipe(eff, Effect.orDie)` |
-| Fork / channel | `forkScoped(eff)` / `Queue.bounded(n)` | Structured green thread / buffered channel |
-| Typed hole | `??? "todo"` | `never` throw + contextual type diagnostic |
+<table>
+<thead>
+<tr>
+<th>Construct</th>
+<th>Syntax</th>
+<th>Compiles to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immutable binding</td>
+<td><code>x = 1</code></td>
+<td><code>const x = 1;</code></td>
+</tr>
+<tr>
+<td>Local mutable / draft</td>
+<td><code>mut x = user</code> / <code>x.a = 1</code></td>
+<td><code>let</code> / Mutative <code>create(user, ...)</code></td>
+</tr>
+<tr>
+<td>Shallow / deep copy</td>
+<td><code>{ ...u, a.b: 1 }</code></td>
+<td><code>{ ...u, ... }</code> / Mutative <code>create(...)</code></td>
+</tr>
+<tr>
+<td>Function</td>
+<td><code>(a: number, b: number) -> a + b</code></td>
+<td><code>(a: number, b: number) => a + b</code></td>
+</tr>
+<tr>
+<td>Pipeline & placeholder</td>
+<td><code>x |> f(a) |> g(1, _)</code></td>
+<td><code>pipe(x, f(a), (__p) => g(1, __p))</code></td>
+</tr>
+<tr>
+<td>Pattern match</td>
+<td><code>match x | A(v) -> v</code></td>
+<td><code>match(x).with({ _tag: "A" }, ...).exhaustive()</code></td>
+</tr>
+<tr>
+<td>Boolean match</td>
+<td><code>match | x |> Number.greaterThan(0) -> "pos" | _ -> "neg"</code></td>
+<td><code>Number.greaterThan(x, 0) ? "pos" : "neg"</code></td>
+</tr>
+<tr>
+<td>Schema & type</td>
+<td><code>schema User = { id: UUID }</code></td>
+<td><code>Schema.Struct(...)</code> + <code>typeof User.Type</code></td>
+</tr>
+<tr>
+<td>Schema constructor</td>
+<td><code>UUID("1")</code> / <code>User({ ... })</code></td>
+<td><code>Schema.UUID.make("1")</code> (literals checked at compile time)</td>
+</tr>
+<tr>
+<td>Tagged union</td>
+<td><code>schema Shape = | Circle(r: number)</code></td>
+<td><code>Data.TaggedEnum</code> + <code>Schema.Union</code></td>
+</tr>
+<tr>
+<td>Typed error</td>
+<td><code>error NotFound(id: UUID)</code></td>
+<td><code>class NotFound extends Schema.TaggedError...</code></td>
+</tr>
+<tr>
+<td>Service</td>
+<td><code>service Repo ...</code></td>
+<td><code>class Repo extends Context.Service...</code></td>
+</tr>
+<tr>
+<td>Direct service call</td>
+<td><code>x &lt;- Repo.find(id)</code></td>
+<td><code>const x = yield* (yield* Repo).find(id);</code></td>
+</tr>
+<tr>
+<td>Effect block</td>
+<td><code>effect</code> + <code>x &lt;- eff</code></td>
+<td><code>Effect.gen(function* () { const x = yield* eff; })</code></td>
+</tr>
+<tr>
+<td>Defect demotion</td>
+<td><code>eff |> orDie</code></td>
+<td><code>pipe(eff, Effect.orDie)</code></td>
+</tr>
+<tr>
+<td>Fork / channel</td>
+<td><code>forkScoped(eff)</code> / <code>Queue.bounded(n)</code></td>
+<td>Structured green thread / buffered channel</td>
+</tr>
+<tr>
+<td>Typed hole</td>
+<td><code>??? "todo"</code></td>
+<td><code>never</code> throw + contextual type diagnostic</td>
+</tr>
+</tbody>
+</table>
