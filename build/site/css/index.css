@@ -432,8 +432,8 @@ b {
 :root,
 [data-theme="light"] {
   --font-size: 1rem;
-  --nav-bg-color:  #f3eff8;
-  --main-bg-color: #f6f4f8;
+  --nav-bg-color:  rgba(243, 239, 248, 0.8);
+  --main-bg-color: rgba(246, 244, 248, 0.75);
   --background-color: #DFDBE5;
   --main-text-color: #0D1B1E;
   --primary-color:  #4e2a84;
