@@ -1,6 +1,6 @@
 ---
 title: "FunScript: Reinventing Functional CoffeeScript"
-tags: ["2026", "FP", "TypeScript"]
+tags: ["2026", "Programming"]
 date: Oct 30, 2026
 ---
 

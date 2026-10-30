@@ -1,6 +1,6 @@
 ---
 title: "SlopBoss: A Board-Driven Orchestrator for Multi-Agent Development"
-tags: ["2026", "Go"]
+tags: ["2026", "Programming"]
 date: Oct 30, 2026
 ---
 

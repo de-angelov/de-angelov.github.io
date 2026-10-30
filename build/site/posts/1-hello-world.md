@@ -1,6 +1,6 @@
 ---
 title: "Hello World"
-tags: ["2025", "Haskell"]
+tags: ["2025", "Programming"]
 date: Jan 18, 2025
 ---
 Arguably, it might be a bit of overengineering for a simple blog to use Haskell. But at least I get programmer cred right?  

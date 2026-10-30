@@ -1,6 +1,6 @@
 ---
 title: "Same App, Different Languages"
-tags: ["2026", "FP", "Haskell", "TypeScript"]
+tags: ["2026", "Programming"]
 date: Feb 27, 2026
 ---
 
