@@ -147,7 +147,7 @@
 
 		toShow.forEach((a, i) => {
 			a.style.display = 'inherit';
-			a.style.animationDelay = (i * 40) + 'ms';
+			a.style.animationDelay = (i * 25) + 'ms';
 			void a.offsetWidth;
 			a.classList.remove('fade-out-effect');
 			a.classList.add('fade-in-effect');
