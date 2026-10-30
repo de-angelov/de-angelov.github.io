@@ -15,7 +15,8 @@ body {
   line-height: 1.5;
   background-attachment: fixed;
   background-color: var(--background-color);
-  background-image: var(--background-image)
+  background-image: var(--background-image);
+  background-blend-mode: var(--background-blend, normal)
 }
 
 header {
@@ -442,41 +443,16 @@ b {
   --background-image: url("/images/background.svg");
 }
 
-[data-theme="dark"] {
-  --font-size: 1rem;
-  --nav-bg-color:  #1E293B;
-  --main-bg-color: #1E293B;
-  --background-color: #0F172A;
-  --main-text-color: #E2E8F0;
-  --primary-color:  #2DD4BF;
-  --padding: 1rem;
-  --main-width: 140ch;
-  --shadow: 0 3px 10px rgb(0 0 0 / 0.4);
-  --background-image: none;
-}
-
-[data-theme="warm"] {
-  --font-size: 1rem;
-  --nav-bg-color:  #EFE9DC;
-  --main-bg-color: #FBF8F1;
-  --background-color: #F5F1E8;
-  --main-text-color: #1C1917;
-  --primary-color:  #B45309;
-  --padding: 1rem;
-  --main-width: 140ch;
-  --shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-  --background-image: none;
-}
-
 [data-theme="purple"] {
   --font-size: 1rem;
   --nav-bg-color:  #2A1A3D;
   --main-bg-color: #2A1A3D;
-  --background-color: #1A1025;
+  --background-color: #120A1C;
   --main-text-color: #E9D5FF;
   --primary-color:  #C084FC;
   --padding: 1rem;
   --main-width: 140ch;
   --shadow: 0 3px 10px rgb(0 0 0 / 0.4);
-  --background-image: none;
+  --background-image: url("/images/background.svg");
+  --background-blend: multiply;
 }
