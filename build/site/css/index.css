@@ -411,6 +411,11 @@ b {
   outline: 1rem solid var(-primary-color);
 }
 
+[data-theme="purple"] .home-page__photo {
+  filter: saturate(1.35) hue-rotate(260deg) brightness(0.9) contrast(1.05);
+  box-shadow: 0 0 2rem rgba(192, 132, 252, 0.35);
+}
+
 
 .fade-up-effect {
     opacity: 0;
