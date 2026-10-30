@@ -141,12 +141,12 @@ b {
   background-clip: padding-box;
   z-index: 2;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
 }
 
 .header__icon svg {
+  position: absolute;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
   fill: var(--primary-color);
