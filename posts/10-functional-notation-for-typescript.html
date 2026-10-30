@@ -224,7 +224,7 @@ TypeScript <code>type</code> aliases.</li>
 </ol>
 <pre>
 <code class="language-js">
-# 1. Branded &amp; refined scalar Schema + static type
+# 1. Branded & refined scalar Schema + static type
 export schema Username =
   string
   |> Schema.trimmed
@@ -666,9 +666,9 @@ export pipeline =
   effect
     jobs &lt;- Queue.bounded&lt;Job>(100)
     _ &lt;- Effect.forkScoped(producer(jobs))
-    _ &lt;- Array.range(1, 4) \|> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
+    _ &lt;- Array.range(1, 4) |> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
     Effect.never
-  \|> Effect.scoped   # closing the scope cleans up all workers automatically
+  |> Effect.scoped   # closing the scope cleans up all workers automatically
 </code>
 </pre>
 <hr />
