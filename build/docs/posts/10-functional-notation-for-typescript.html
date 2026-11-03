@@ -104,9 +104,9 @@ export class UserRepo extends Context.Service&lt;UserRepo, {
 
 export const UserRepoLive = Layer.succeed(UserRepo, {
   find: (id) =>
-    id === "1"
-      ? Effect.succeed({ id: "1" as Schema.UUID, name: "Ada" as Schema.NonEmptyString })
-      : Effect.fail(new NotFound({ id })),
+    match(id)
+      .with("1", () => Effect.succeed({ id: "1" as Schema.UUID, name: "Ada" as Schema.NonEmptyString }))
+      .otherwise(() => Effect.fail(new NotFound({ id }))),
 });
 
 export const main = Effect.gen(function* () {
