@@ -4,7 +4,7 @@ tags: ["2026", "Programming"]
 date: Oct 30, 2026
 ---
 
-*Disclaimer: FunScript is currently an idea and design exploration — there is no compiler implementation yet. It is a thought experiment exploring what the ideal functional notation for the TypeScript and Effect ecosystem could look like.*
+*Disclaimer: FunScript is currently an experimental design and implementation effort — an early compiler and toolchain (v0.1.0) now exists in a local checkout, with the language reference generated from the implementation. It began as a thought experiment exploring what the ideal functional notation for the TypeScript and Effect ecosystem could look like; the design below is that thinking, and the compiler is now catching up to it.*
 
 In 2010, **CoffeeScript** captured the developer world with a simple, seductive promise: *"It's just JavaScript."* By replacing curly braces, semicolons, and verbose function declarations with clean indentation and expression-oriented syntax, it proved that writing code for the web could be elegant, joyful, and concise. But CoffeeScript was untyped, dynamic, and preceded modern functional paradigms. When ES6 arrived and brought native arrow functions, destructuring, and classes, CoffeeScript's original job was done.
 
@@ -14,7 +14,9 @@ The problem isn't what those libraries do — it's **how much syntax ceremony it
 
 What if CoffeeScript were reborn today, not for imperative JavaScript, but for purely functional TypeScript?
 
-**FunScript is that idea**: CoffeeScript's calm, indentation-based elegance combined with F#'s expression-oriented power, compiled 1-to-1 to readable TypeScript for the Effect + ts-pattern + Mutative stack. A small, **15-keyword**, zero-runtime notation that keeps the TypeScript type checker (`tsc`), uses Effect TS as its standard library, and makes writing correct programs the path of least resistance.
+**FunScript is that idea**: CoffeeScript's calm, indentation-based elegance combined with F#'s expression-oriented power, compiled 1-to-1 to readable TypeScript for the Effect + ts-pattern + Mutative stack. A small, **17-keyword**, zero-runtime notation that keeps the TypeScript type checker (`tsc`), uses Effect TS as its standard library, and makes writing correct programs the path of least resistance.
+
+**Status:** FunScript now exists as an experimental compiler and toolchain — `funscript build`, `funscript emit`, `funscript check`, `funscript run`, `funscript repl`, `funscript lsp`, `funscript fmt`, and `funscript version` are implemented, alongside a Vite plugin and a VS Code extension, with 20 runnable checked examples and a language reference generated from the implementation. The design above is the thinking; the compiler is now catching up to it.
 
 ---
 
@@ -70,19 +72,20 @@ export schema User = {
 export error NotFound(id: string)
 
 export service UserRepo
-  find: (id: string) -> Effect&lt;User, NotFound>
+  find: (id: string) => Effect&lt;User, NotFound>
 
 export UserRepoLive = Layer.succeed(UserRepo, {
-  find: (id) ->
+  find: (id) =>
     match
-      | id == "1" -> Effect.succeed({ id: UUID("1"), name: NonEmptyString("Ada") })
-      | _ -> Effect.fail(NotFound(id))
+      | id == "1" => Effect.succeed({ id: UUID("1"), name: NonEmptyString("Ada") })
+      | _ => Effect.fail(NotFound(id))
 })
 
 export main =
-  effect
+  effect {
     user &lt;- UserRepo.find("1")
     user.name
+  }
   |> Effect.provide(UserRepoLive)
 </code>
 </pre>
@@ -101,9 +104,9 @@ JavaScript and TypeScript have accumulated decades of competing ways to express 
 
 This design takes the opposite stance — **one way per job**:
 
-- **15 keywords total:** `and`, `effect`, `error`, `export`, `false`, `from`, `import`, `match`, `mut`, `not`, `or`, `schema`, `service`, `true`, `when`.
+- **17 keywords total:** `and`, `effect`, `error`, `export`, `false`, `from`, `import`, `js`, `match`, `mut`, `not`, `or`, `schema`, `service`, `true`, `ts`, `when` — with the `js` and `ts` keywords as explicit escape hatches for JavaScript/Promise interop and TypeScript blocks.
 - **No `if`, `then`, `else`, `switch`, or `? :`** — `match` handles both structural pattern matching and boolean branching.
-- **No `return`** — every function, `match` arm, and `effect` block is an expression that evaluates to its final line.
+- **No `return`** — every function, `match` arm, and `effect` block is an expression that evaluates to its final line; explicit returns use `=> expr`.
 - **No `null`, `undefined`, or `any`** — absence is `Option<A>`, and untrusted boundaries use `raw |> Schema.decode(Type)` (there is no `as` keyword).
 - **Effect TS data types as primitives** — `Int`, `Float`, `Decimal`, `DateTimeUtc` replace fragile `number` and `Date`; comparisons (`<, <=, >, >=`) are pure data-last functions (`Number.greaterThan`).
 - **No `class`, `new`, `this`, `interface`, `enum`, `type`, or `data`** — one `schema` keyword handles schemas, tagged unions, and type aliases.
@@ -146,7 +149,7 @@ export schema Shape =
   | Rect(width: number, height: number)
 
 # 4. Compile-time TypeScript alias (no runtime output)
-export schema Lookup = (id: UUID) -> Effect&lt;User, NotFound>
+export schema Lookup = (id: UUID) => Effect&lt;User, NotFound>
 </code>
 </pre>
 
@@ -173,20 +176,20 @@ There is no `if`/`else`, `switch`, or ternary `? :`. Instead, `match` has two fo
 
 <pre>
 <code class="language-js">
-export describe = (shape: Shape) ->
+export describe = (shape: Shape) =>
   match shape
-    | Circle(0) -> "point"
-    | Circle(r) when r |> Number.greaterThan(100) -> "huge circle ({r})"
-    | Circle(r) -> "circle ({r})"
-    | Rect(w, h) -> "{w} by {h}"
+    | Circle(0) => "point"
+    | Circle(r) when r |> Number.greaterThan(100) => "huge circle ({r})"
+    | Circle(r) => "circle ({r})"
+    | Rect(w, h) => "{w} by {h}"
 
-# Or-patterns (`| A | B ->`) and pipeline `|> match`
-export findName = (users: Array&lt;User>, id: string) ->
+# Or-patterns (`| A | B =>`) and pipeline `|> match`
+export findName = (users: Array&lt;User>, id: string) =>
   users
-  |> Array.findFirst((u) -> u.id == id)
+  |> Array.findFirst((u) => u.id == id)
   |> match
-    | Some({ name }) -> name
-    | None -> "anonymous"
+    | Some({ name }) => name
+    | None => "anonymous"
 </code>
 </pre>
 
@@ -197,19 +200,19 @@ When `match` has no scrutinee expression, each arm is a boolean condition that c
 <pre>
 <code class="language-js">
 # Inline two-branch expression (comparisons are pure data-last functions)
-sign = match | n |> Number.greaterThan(0) -> "positive" | _ -> "non-positive"
+sign = match | n |> Number.greaterThan(0) => "positive" | _ => "non-positive"
 
 # Multi-branch block
 tier =
   match
-    | score |> Number.greaterThanOrEqualTo(90) and verified -> "platinum"
-    | score |> Number.greaterThanOrEqualTo(75) -> "gold"
-    | score |> Number.greaterThanOrEqualTo(50) -> "silver"
-    | _ -> "bronze"
+    | score |> Number.greaterThanOrEqualTo(90) and verified => "platinum"
+    | score |> Number.greaterThanOrEqualTo(75) => "gold"
+    | score |> Number.greaterThanOrEqualTo(50) => "silver"
+    | _ => "bronze"
 </code>
 </pre>
 
-When used as a value expression, a trailing `| _ ->` fallback is required so a conditional can never silently evaluate to `undefined`.
+When used as a value expression, a trailing `| _ =>` fallback is required so a conditional can never silently evaluate to `undefined`.
 
 ---
 
@@ -231,7 +234,7 @@ score =
 </code>
 </pre>
 
-Point-free composition (`>>`) is intentionally omitted because `flow(f, g)` degrades TypeScript's generic type inference; writing `(x) -> x |> f |> g` is nearly as short and preserves full contextual inference.
+Point-free composition (`>>`) is intentionally omitted because `flow(f, g)` degrades TypeScript's generic type inference; writing `(x) => x |> f |> g` is nearly as short and preserves full contextual inference.
 
 #### Type-directed pipeline resolution (auto-namespace)
 
@@ -242,10 +245,10 @@ To eliminate repetitive module prefixes (`Array.`, `Option.`, `Effect.`), bare f
 # Clean, readable pipelines without repetitive "Array." prefixes:
 topActive =
   users
-  |> filter((u) -> u.active)
-  |> sortBy((u) -> u.name)
+  |> filter((u) => u.active)
+  |> sortBy((u) => u.name)
   |> take(10)
-  |> map((u) -> u.name)
+  |> map((u) => u.name)
 </code>
 </pre>
 
@@ -278,22 +281,22 @@ moved = {
 
 #### Imperative copy-on-write with `mut` + `=` (10% of updates)
 
-When you need step-by-step updates, array methods (`.push`, `.splice`, `.sort`), or conditional mutations, declare a local `mut` binding or pipe into `|> mut (draft) ->`:
+When you need step-by-step updates, array methods (`.push`, `.splice`, `.sort`), or conditional mutations, declare a local `mut` binding or pipe into `|> mut (draft) =>`:
 
 <pre>
 <code class="language-js">
-recordLogin = (user: User) ->
+recordLogin = (user: User) =>
   mut draft = user
   draft.visits = draft.visits + 1
   draft.tags.push("active")
   match
-    | draft.visits > 10 -> draft.tier = "gold"
+    | draft.visits > 10 => draft.tier = "gold"
   draft
 
 # Or inline in a pipeline:
 updated =
   user
-  |> mut (d) -> d.tags.push("onboarded")
+  |> mut (d) => d.tags.push("onboarded")
 </code>
 </pre>
 
@@ -316,11 +319,12 @@ export schema Todo = {
   completed: boolean
 }
 
-export fetchTodo = (id: number) ->
-  effect
+export fetchTodo = (id: number) =>
+  effect {
     response &lt;- HttpClient.get("https://jsonplaceholder.typicode.com/todos/{id}")
     todo &lt;- response |> HttpClientResponse.schemaBodyJson(Todo)
     { ...todo, completed: true }
+  }
   |> Effect.retry(Schedule.exponential("100 millis"))
   |> Effect.provide(FetchHttpClient.layer)
 </code>
@@ -334,11 +338,12 @@ Instead of manually fetching a service tag before calling its methods (`repo <- 
 
 <pre>
 <code class="language-js">
-export getUser = (id: string) ->
-  effect
+export getUser = (id: string) =>
+  effect {
     user <- UserRepo.find(id)
     org <- OrgRepo.find(user.orgId)
     { user, org }
+  }
 </code>
 </pre>
 
@@ -351,9 +356,10 @@ When an error represents an invariant violation or unrecoverable defect, `|> orD
 <pre>
 <code class="language-js">
 export loadDefaultConfig =
-  effect
+  effect {
     config <- ConfigRepo.loadDefault |> orDie
     config
+  }
 </code>
 </pre>
 
@@ -365,10 +371,11 @@ While sketching an implementation, you can drop `???` (or `??? "label"`) into an
 
 <pre>
 <code class="language-js">
-export checkout = (user: User, cart: Cart): Effect&lt;Receipt, PaymentError> ->
-  effect
+export checkout = (user: User, cart: Cart): Effect&lt;Receipt, PaymentError> =>
+  effect {
     total = calculateTotal(cart)
     ??? "charge payment provider"
+  }
 </code>
 </pre>
 
@@ -386,7 +393,7 @@ warning[funscript/typed-hole]: Unfinished hole `???` ("charge payment provider")
 </code>
 </pre>
 
-Typed holes emit warnings during `funscript dev` and `funscript test` (so you can run other branches while iterating) and are a hard error in `funscript build`.
+Typed holes emit structured warnings while iterating (via `funscript check` and the LSP, so you can run and test other branches) and are a hard error in `funscript build`.
 
 ---
 
@@ -430,17 +437,19 @@ Time becomes testable without real waiting:
 
 <pre>
 <code class="language-js">
-export isExpired = (token: Token) ->
-  effect
+export isExpired = (token: Token) =>
+  effect {
     now &lt;- DateTime.now
     DateTime.greaterThan(now, token.expiresAt)
+  }
 
-it.effect("expires after one hour", ->
-  effect
+it.effect("expires after one hour", =>
+  effect {
     token &lt;- issueToken(user)
     _ &lt;- TestClock.adjust("61 minutes")
     expired &lt;- isExpired(token)
     expect(expired).toBe(true)
+  }
 )
 </code>
 </pre>
@@ -504,11 +513,12 @@ Unlike Go goroutines, Effect fibers are **structured**: tied to an enclosing `Sc
 <code class="language-js">
 # Producer / consumer pipeline with 4 background workers
 export pipeline =
-  effect
+  effect {
     jobs &lt;- Queue.bounded&lt;Job>(100)
     _ &lt;- Effect.forkScoped(producer(jobs))
-    _ &lt;- Array.range(1, 4) |> Effect.forEach((id) -> Effect.forkScoped(worker(jobs, id)))
+    _ &lt;- Array.range(1, 4) |> Effect.forEach((id) => Effect.forkScoped(worker(jobs, id)))
     Effect.never
+  }
   |> Effect.scoped   # closing the scope cleans up all workers automatically
 </code>
 </pre>
@@ -543,7 +553,7 @@ export pipeline =
 </tr>
 <tr>
 <td>Function</td>
-<td><code>(a: number, b: number) -> a + b</code></td>
+<td><code>(a: number, b: number) => a + b</code></td>
 <td><code>(a: number, b: number) => a + b</code></td>
 </tr>
 <tr>
@@ -553,12 +563,12 @@ export pipeline =
 </tr>
 <tr>
 <td>Pattern match</td>
-<td><code>match x | A(v) -> v</code></td>
+<td><code>match x | A(v) => v</code></td>
 <td><code>match(x).with({ _tag: "A" }, ...).exhaustive()</code></td>
 </tr>
 <tr>
 <td>Boolean match</td>
-<td><code>match | x |> Number.greaterThan(0) -> "pos" | _ -> "neg"</code></td>
+<td><code>match | x |> Number.greaterThan(0) => "pos" | _ => "neg"</code></td>
 <td><code>Number.greaterThan(x, 0) ? "pos" : "neg"</code></td>
 </tr>
 <tr>
@@ -593,7 +603,7 @@ export pipeline =
 </tr>
 <tr>
 <td>Effect block</td>
-<td><code>effect</code> + <code>x &lt;- eff</code></td>
+<td><code>effect { ... }</code> + <code>x &lt;- eff</code></td>
 <td><code>Effect.gen(function* () { const x = yield* eff; })</code></td>
 </tr>
 <tr>
